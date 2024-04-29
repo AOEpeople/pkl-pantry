@@ -1,0 +1,2 @@
+runtimeData.links('known-versions','[{"text":"0.1.0","classes":"current-version"}]');
+runtimeData.links('known-subtypes','[{"text":"IncludeItemComponent","href":"IncludeItemComponent.html"},{"text":"IncludeItemLocal","href":"IncludeItemLocal.html"},{"text":"IncludeItemProject","href":"IncludeItemProject.html"},{"text":"IncludeItemRemote","href":"IncludeItemRemote.html"},{"text":"IncludeItemTemplate","href":"IncludeItemTemplate.html"}]');
