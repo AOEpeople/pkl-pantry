@@ -1,0 +1,12 @@
+/// Module that provides a configurable golang generate job
+module com.gitlab.ci.golang.jobs.generate
+
+import ".../golang.pkl"
+
+/// Golang generate job
+class Job extends golang.AbstractGolangJob {
+  inputs = super.inputs |> golang.withArg("./...")
+  script {
+    "go generate \(inputs.args.join(" "))"
+  }
+}

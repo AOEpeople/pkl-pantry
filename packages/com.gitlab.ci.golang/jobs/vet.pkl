@@ -1,0 +1,12 @@
+/// Module that provides a configurable golang vet job
+module com.gitlab.ci.golang.jobs.vet
+
+import ".../golang.pkl"
+
+/// Golang vet job
+class Job extends golang.AbstractGolangJob {
+  inputs = super.inputs |> golang.withArg("./...")
+  script {
+    "go vet \(inputs.args.join(" "))"
+  }
+}

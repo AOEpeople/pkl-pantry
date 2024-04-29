@@ -1,0 +1,155 @@
+/// Functions to convert strings (case styles ... )
+module com.aoe.opensource.strings.convert
+
+import "assert.pkl"
+
+// Delimiters
+const SPACE = " "
+const SNAKE_CASE_DELIMITER = "_"
+const KEBAB_CASE_DELIMITER = "-"
+const DOT_NOTATION_DELIMITER = "."
+
+//----------------------------------------------------------------------------------------------------------------------
+// Snake Case
+
+local function delimitedToSnakeCase(text: String, replacement: String): String =
+  text.replaceAll(replacement, SNAKE_CASE_DELIMITER).toLowerCase()
+
+/// Converts a given string to snake_case
+function convertToSnakeCase(text: String, errorMessage: String): String =
+  let (text = text.trim())
+    if (assert.isSnakeCase(text))
+      text.toLowerCase()
+    else if (text.contains(SPACE))
+      delimitedToSnakeCase(text, SPACE)
+    else if (assert.isKebabCase(text))
+      delimitedToSnakeCase(text, KEBAB_CASE_DELIMITER)
+    else if (assert.isDotNotation(text))
+      delimitedToSnakeCase(text, DOT_NOTATION_DELIMITER)
+    else if (assert.isCamelCase(text))
+      camelCaseToDelimited(text, SNAKE_CASE_DELIMITER)
+    else if (assert.isPascalCase(text))
+      pascalCaseToDelimited(text, SNAKE_CASE_DELIMITER)
+    else
+      throw(errorMessage)
+
+/// Converts a given string to snake_case
+function toSnakeCase(text: String): String =
+  convertToSnakeCase(text, "unable to convert '\(text)' to snake case")
+
+/// Converts a given string to UPPER_SNAKE_CASE
+function toUpperSnakeCase(text: String): String =
+  convertToSnakeCase(text, "unable to convert '\(text)' to upper snake case").toUpperCase()
+
+//----------------------------------------------------------------------------------------------------------------------
+// Kebab Case
+
+local function delimitedToKebabCase(text: String, replacement: String): String =
+  text.replaceAll(replacement, KEBAB_CASE_DELIMITER).toLowerCase()
+
+// Converts a given string to kebab-case
+local function convertToKebabCase(text: String, errorMessage: String): String =
+  let (text = text.trim())
+    if (assert.isKebabCase(text))
+      text.toLowerCase()
+    else if (text.contains(SPACE))
+      delimitedToKebabCase(text, SPACE)
+    else if (assert.isSnakeCase(text))
+      delimitedToKebabCase(text, SNAKE_CASE_DELIMITER)
+    else if (assert.isDotNotation(text))
+      delimitedToKebabCase(text, DOT_NOTATION_DELIMITER)
+    else if (assert.isCamelCase(text))
+      camelCaseToDelimited(text, KEBAB_CASE_DELIMITER)
+    else if (assert.isPascalCase(text))
+      pascalCaseToDelimited(text, KEBAB_CASE_DELIMITER)
+    else
+      throw(errorMessage)
+
+/// Converts a given string to kebab-case
+function toKebabCase(text: String): String =
+  convertToKebabCase(text, "unable to convert '\(text)' to kebab case")
+
+/// Converts a given string to UPPER-KEBAB-CASE
+function toUpperKebabCase(text: String): String =
+  convertToKebabCase(text, "unable to convert '\(text)' to upper kebab case").toUpperCase()
+
+//----------------------------------------------------------------------------------------------------------------------
+// Dot Notation
+
+local function delimitedToDotNotation(text: String, replacement: String): String =
+  text.replaceAll(replacement, DOT_NOTATION_DELIMITER).toLowerCase()
+
+// Converts a given string to kebab-case
+local function convertToDotNotation(text: String, errorMessage: String): String =
+  let (text = text.trim())
+    if (assert.isDotNotation(text))
+      text.toLowerCase()
+    else if (text.contains(SPACE))
+      delimitedToDotNotation(text, SPACE)
+    else if (assert.isSnakeCase(text))
+      delimitedToDotNotation(text, SNAKE_CASE_DELIMITER)
+    else if (assert.isKebabCase(text))
+      delimitedToDotNotation(text, KEBAB_CASE_DELIMITER)
+    else if (assert.isCamelCase(text))
+      camelCaseToDelimited(text, DOT_NOTATION_DELIMITER)
+    else if (assert.isPascalCase(text))
+      pascalCaseToDelimited(text, DOT_NOTATION_DELIMITER)
+    else
+      throw(errorMessage)
+
+/// Converts a given string to kebab-case
+function toDotNotation(text: String): String =
+  convertToDotNotation(text, "unable to convert '\(text)' to dot notation")
+
+/// Converts a given string to UPPER-KEBAB-CASE
+function toUpperDotNotation(text: String): String =
+  convertToDotNotation(text, "unable to convert '\(text)' to upper dot notation").toUpperCase()
+
+//----------------------------------------------------------------------------------------------------------------------
+// Camel Case
+
+// Matchers
+local const SPACE_MATCHER = Regex(#"\s[a-zA-Z0-9]"#)
+local const SNAKE_CASE_MATCHER = Regex(#"_[a-zA-Z0-9]"#)
+local const KEBAB_CASE_MATCHER = Regex(#"-[a-zA-Z0-9]"#)
+local const DOT_NOTATION_MATCHER = Regex(#"\.[a-zA-Z0-9]"#)
+
+// Converts camel case to delimited string
+local function camelCaseToDelimited(text: String, delimiter: String): String =
+  text.replaceAllMapped(Regex(#"[A-Z]+"#), (match) -> delimiter + match.toString().toLowerCase())
+
+local function delimitedToCamelCase(text: String, matcher: Regex, delimiter: String): String =
+  text.toLowerCase().replaceAllMapped(matcher, (match) -> match.toString().replaceAll(delimiter, "").toUpperCase())
+
+// Converts a given string to camelCase
+local function convertToCamelCase(text: String, errorMessage: String): String =
+  let (text = text.trim())
+    if (assert.isCamelCase(text))
+      text
+    else if (text.contains(SPACE))
+      delimitedToCamelCase(text, SPACE_MATCHER, SPACE)
+    else if (assert.isSnakeCase(text))
+      delimitedToCamelCase(text, SNAKE_CASE_MATCHER, SNAKE_CASE_DELIMITER)
+    else if (assert.isKebabCase(text))
+      delimitedToCamelCase(text, KEBAB_CASE_MATCHER, KEBAB_CASE_DELIMITER)
+    else if (assert.isDotNotation(text))
+      delimitedToCamelCase(text, DOT_NOTATION_MATCHER, DOT_NOTATION_DELIMITER)
+    else if (assert.isPascalCase(text))
+      text.decapitalize()
+    else
+      throw(errorMessage)
+
+/// Converts a given string to camelCase
+function toCamelCase(text: String): String =
+  convertToCamelCase(text, "unable to convert '\(text)' to camel case")
+
+//----------------------------------------------------------------------------------------------------------------------
+// Pascal Case
+
+// Converts pascal case to delimited string
+local function pascalCaseToDelimited(text: String, delimiter: String): String =
+  camelCaseToDelimited(text.decapitalize(), delimiter)
+
+/// Converts a given string to PascalCase
+function toPascalCase(text: String): String =
+  convertToCamelCase(text, "unable to convert '\(text)' to camel case").capitalize()

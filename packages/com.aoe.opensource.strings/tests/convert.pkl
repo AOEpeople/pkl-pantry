@@ -1,0 +1,144 @@
+module com.aoe.opensource.tests.convert
+
+amends "pkl:test"
+
+import ".../convert.pkl"
+import ".../assert.pkl"
+
+local spaces = "no style with space"
+local snakeCase = "SnAkE_CaSe"
+local upperSnakeCase = "UPPER_SNAKE_CASE"
+local lowerSnakeCase = "snake_case"
+local kebabCase = "KeBaB-CaSe"
+local upperKebabCase = "UPPER-KEBAB-CASE"
+local lowerKebabCase = "kebab-case"
+local dotNotation = "DoT.nOtAtIoN"
+local upperDotNotation = "DOT.NOTATION"
+local lowerDotNotation = "dot.notation"
+local camelCase = "camelCase"
+local pascalCase = "PascalCase"
+
+facts {
+  ["toSnakeCase"] {
+    assert.isLowerSnakeCase(convert.toSnakeCase(spaces))
+    assert.isLowerSnakeCase(convert.toSnakeCase(snakeCase))
+    assert.isLowerSnakeCase(convert.toSnakeCase(lowerSnakeCase))
+    assert.isLowerSnakeCase(convert.toSnakeCase(upperSnakeCase))
+    assert.isLowerSnakeCase(convert.toSnakeCase(kebabCase))
+    assert.isLowerSnakeCase(convert.toSnakeCase(lowerKebabCase))
+    assert.isLowerSnakeCase(convert.toSnakeCase(upperKebabCase))
+    assert.isLowerSnakeCase(convert.toSnakeCase(dotNotation))
+    assert.isLowerSnakeCase(convert.toSnakeCase(lowerDotNotation))
+    assert.isLowerSnakeCase(convert.toSnakeCase(upperDotNotation))
+    assert.isLowerSnakeCase(convert.toSnakeCase(camelCase))
+    assert.isLowerSnakeCase(convert.toSnakeCase(pascalCase))
+
+    // make sure that cominations of uppercase chars are treated as one and not splitted
+    convert.toUpperSnakeCase("CommitSHA") == "COMMIT_SHA"
+  }
+
+  ["toUpperSnakeCase"] {
+    assert.isUpperSnakeCase(convert.toUpperSnakeCase(spaces))
+    assert.isUpperSnakeCase(convert.toUpperSnakeCase(snakeCase))
+    assert.isUpperSnakeCase(convert.toUpperSnakeCase(lowerSnakeCase))
+    assert.isUpperSnakeCase(convert.toUpperSnakeCase(upperSnakeCase))
+    assert.isUpperSnakeCase(convert.toUpperSnakeCase(kebabCase))
+    assert.isUpperSnakeCase(convert.toUpperSnakeCase(lowerKebabCase))
+    assert.isUpperSnakeCase(convert.toUpperSnakeCase(upperKebabCase))
+    assert.isUpperSnakeCase(convert.toUpperSnakeCase(dotNotation))
+    assert.isUpperSnakeCase(convert.toUpperSnakeCase(lowerDotNotation))
+    assert.isUpperSnakeCase(convert.toUpperSnakeCase(upperDotNotation))
+    assert.isUpperSnakeCase(convert.toUpperSnakeCase(camelCase))
+    assert.isUpperSnakeCase(convert.toUpperSnakeCase(pascalCase))
+  }
+
+  ["toKebabCase"] {
+    assert.isLowerKebabCase(convert.toKebabCase(spaces))
+    assert.isLowerKebabCase(convert.toKebabCase(snakeCase))
+    assert.isLowerKebabCase(convert.toKebabCase(lowerSnakeCase))
+    assert.isLowerKebabCase(convert.toKebabCase(upperSnakeCase))
+    assert.isLowerKebabCase(convert.toKebabCase(kebabCase))
+    assert.isLowerKebabCase(convert.toKebabCase(lowerKebabCase))
+    assert.isLowerKebabCase(convert.toKebabCase(upperKebabCase))
+    assert.isLowerKebabCase(convert.toKebabCase(dotNotation))
+    assert.isLowerKebabCase(convert.toKebabCase(lowerDotNotation))
+    assert.isLowerKebabCase(convert.toKebabCase(upperDotNotation))
+    assert.isLowerKebabCase(convert.toKebabCase(camelCase))
+    assert.isLowerKebabCase(convert.toKebabCase(pascalCase))
+  }
+
+  ["toUpperKebabCase"] {
+    assert.isUpperKebabCase(convert.toUpperKebabCase(spaces))
+    assert.isUpperKebabCase(convert.toUpperKebabCase(snakeCase))
+    assert.isUpperKebabCase(convert.toUpperKebabCase(lowerSnakeCase))
+    assert.isUpperKebabCase(convert.toUpperKebabCase(upperSnakeCase))
+    assert.isUpperKebabCase(convert.toUpperKebabCase(kebabCase))
+    assert.isUpperKebabCase(convert.toUpperKebabCase(lowerKebabCase))
+    assert.isUpperKebabCase(convert.toUpperKebabCase(upperKebabCase))
+    assert.isUpperKebabCase(convert.toUpperKebabCase(dotNotation))
+    assert.isUpperKebabCase(convert.toUpperKebabCase(lowerDotNotation))
+    assert.isUpperKebabCase(convert.toUpperKebabCase(upperDotNotation))
+    assert.isUpperKebabCase(convert.toUpperKebabCase(camelCase))
+    assert.isUpperKebabCase(convert.toUpperKebabCase(pascalCase))
+  }
+
+  ["toDotNotation"] {
+    assert.isLowerDotNotation(convert.toDotNotation(spaces))
+    assert.isLowerDotNotation(convert.toDotNotation(snakeCase))
+    assert.isLowerDotNotation(convert.toDotNotation(lowerSnakeCase))
+    assert.isLowerDotNotation(convert.toDotNotation(upperSnakeCase))
+    assert.isLowerDotNotation(convert.toDotNotation(kebabCase))
+    assert.isLowerDotNotation(convert.toDotNotation(lowerKebabCase))
+    assert.isLowerDotNotation(convert.toDotNotation(upperKebabCase))
+    assert.isLowerDotNotation(convert.toDotNotation(dotNotation))
+    assert.isLowerDotNotation(convert.toDotNotation(lowerDotNotation))
+    assert.isLowerDotNotation(convert.toDotNotation(upperDotNotation))
+    assert.isLowerDotNotation(convert.toDotNotation(camelCase))
+    assert.isLowerDotNotation(convert.toDotNotation(pascalCase))
+  }
+
+  ["toUpperDotNotation"] {
+    assert.isUpperDotNotation(convert.toUpperDotNotation(spaces))
+    assert.isUpperDotNotation(convert.toUpperDotNotation(snakeCase))
+    assert.isUpperDotNotation(convert.toUpperDotNotation(lowerSnakeCase))
+    assert.isUpperDotNotation(convert.toUpperDotNotation(upperSnakeCase))
+    assert.isUpperDotNotation(convert.toUpperDotNotation(kebabCase))
+    assert.isUpperDotNotation(convert.toUpperDotNotation(lowerKebabCase))
+    assert.isUpperDotNotation(convert.toUpperDotNotation(upperKebabCase))
+    assert.isUpperDotNotation(convert.toUpperDotNotation(dotNotation))
+    assert.isUpperDotNotation(convert.toUpperDotNotation(lowerDotNotation))
+    assert.isUpperDotNotation(convert.toUpperDotNotation(upperDotNotation))
+    assert.isUpperDotNotation(convert.toUpperDotNotation(camelCase))
+    assert.isUpperDotNotation(convert.toUpperDotNotation(pascalCase))
+  }
+
+  ["toCamelCase"] {
+    assert.isCamelCase(convert.toCamelCase(spaces))
+    assert.isCamelCase(convert.toCamelCase(snakeCase))
+    assert.isCamelCase(convert.toCamelCase(lowerSnakeCase))
+    assert.isCamelCase(convert.toCamelCase(upperSnakeCase))
+    assert.isCamelCase(convert.toCamelCase(kebabCase))
+    assert.isCamelCase(convert.toCamelCase(lowerKebabCase))
+    assert.isCamelCase(convert.toCamelCase(upperKebabCase))
+    assert.isCamelCase(convert.toCamelCase(dotNotation))
+    assert.isCamelCase(convert.toCamelCase(lowerDotNotation))
+    assert.isCamelCase(convert.toCamelCase(upperDotNotation))
+    assert.isCamelCase(convert.toCamelCase(camelCase))
+    assert.isCamelCase(convert.toCamelCase(pascalCase))
+  }
+
+  ["toPascalCase"] {
+    assert.isPascalCase(convert.toPascalCase(spaces))
+    assert.isPascalCase(convert.toPascalCase(snakeCase))
+    assert.isPascalCase(convert.toPascalCase(lowerSnakeCase))
+    assert.isPascalCase(convert.toPascalCase(upperSnakeCase))
+    assert.isPascalCase(convert.toPascalCase(kebabCase))
+    assert.isPascalCase(convert.toPascalCase(lowerKebabCase))
+    assert.isPascalCase(convert.toPascalCase(upperKebabCase))
+    assert.isPascalCase(convert.toPascalCase(dotNotation))
+    assert.isPascalCase(convert.toPascalCase(lowerDotNotation))
+    assert.isPascalCase(convert.toPascalCase(upperDotNotation))
+    assert.isPascalCase(convert.toPascalCase(camelCase))
+    assert.isPascalCase(convert.toPascalCase(pascalCase))
+  }
+}

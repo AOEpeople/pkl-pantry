@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "resolvedDependencies": {
+    "package://opensource.aoe.com/pkl-pantry/packages/com.aoe.opensource.strings@0": {
+      "type": "local",
+      "uri": "projectpackage://opensource.aoe.com/pkl-pantry/packages/com.aoe.opensource.strings@0.1.1",
+      "path": "../com.aoe.opensource.strings"
+    },
+    "package://opensource.aoe.com/pkl-pantry/packages/com.gitlab.ci.schema@0": {
+      "type": "local",
+      "uri": "projectpackage://opensource.aoe.com/pkl-pantry/packages/com.gitlab.ci.schema@0.1.1",
+      "path": "../com.gitlab.ci.schema"
+    }
+  }
+}

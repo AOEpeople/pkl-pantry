@@ -1,0 +1,46 @@
+/// Used to specify a list of files and directories that should be attached to the job if it succeeds.
+/// Artifacts are sent to Gitlab where they can be downloaded.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#artifacts).
+@ModuleInfo { minPklVersion = "0.25.1" }
+module com.gitlab.ci.schema.Artifacts
+
+import "gitlab.pkl"
+
+/// Name for the archive created on job success. Can use variables in the name, e.g. '$CI_JOB_NAME'
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#artifactsname).
+name: String?
+
+/// A list of paths to files/folders that should be included in the artifact.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#artifactspaths).
+paths: Listing<String>(!isEmpty)?
+
+/// A list of paths to files/folders that should be excluded in the artifact.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#artifactsexclude).
+exclude: Listing<String>(!isEmpty)?
+
+/// Can be used to expose job artifacts in the merge request UI.
+/// GitLab will add a link <expose_as> to the relevant merge request that points to the artifact.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#artifactsexpose_as)."
+expose_as: String?
+
+/// Whether to add all untracked files (along with 'artifacts.paths') to the artifact.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#artifactsuntracked).
+untracked: Boolean = false
+
+/// Configure when artifacts are uploaded depended on job status.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#artifactswhen).
+`when`: "on_success"|"on_failure"|"always" = "on_success"
+
+/// Configure who can access the artifacts. [Learn More](https://docs.gitlab.com/ee/ci/yaml/#artifactsaccess).
+access: "none"|"developer"|"all" = "all"
+
+/// How long artifacts should be kept. They are saved 30 days by default.
+/// Artifacts that have expired are removed periodically via cron job.
+/// Supports a wide variety of formats, e.g. '1 week', '3 mins 4 sec', '2 hrs 20 min', '2h20min', '6 mos 1 day',
+/// '47 yrs 6 mos and 4d', '3 weeks and 2 days'.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#artifactsexpire_in).",
+expire_in: String = "30 days"
+
+/// Reports will be uploaded as artifacts, and often displayed in the Gitlab UI, such as in Merge Requests.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#artifactsreports).
+reports: gitlab.Reports?

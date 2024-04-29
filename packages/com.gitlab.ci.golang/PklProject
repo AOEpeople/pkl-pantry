@@ -1,0 +1,13 @@
+amends ".../basePklProject.pkl"
+
+package {
+  version = "0.1.0"
+  description = """
+    Package that provides golang specific jobs and resources for Gitlab-CI
+    """
+}
+
+dependencies {
+  ["gitlabci"] = import("../com.gitlab.ci.schema/PklProject")
+  ["aoestrings"] = import("../com.aoe.opensource.strings/PklProject")
+}

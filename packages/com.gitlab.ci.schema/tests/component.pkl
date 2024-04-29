@@ -1,0 +1,12 @@
+module com.gitlab.ci.schema.tests.component
+amends "pkl:test"
+
+local allExamples = import*("../examples/component/*.pkl")
+
+examples {
+  for (example in allExamples.keys) {
+    [example.drop("../examples/component/".length).replaceLast("pkl", "yml")] {
+      allExamples[example].output.text
+    }
+  }
+}

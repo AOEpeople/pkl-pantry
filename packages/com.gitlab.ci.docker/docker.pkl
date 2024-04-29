@@ -1,0 +1,90 @@
+/// Configurable docker jobs for Gitlab-CI
+module com.gitlab.ci.docker
+
+import "@gitlabci/AbstractJob.pkl"
+import "@gitlabci/AbstractService.pkl"
+import "@gitlabci/gitlab.pkl"
+import "@aoestrings/regex.pkl" as aoeregex
+
+/// Docker-Hub registry host name
+const DOCKER_HUB_REGISTRY_HOSTNAME = "docker.io"
+
+/// Golang Docker-Hub repository
+const DOCKER_REPOSITORY_NAME = "library/docker"
+
+/// Default docker version (image tag)
+const DOCKER_DEFAULT_VERSION = "26"
+
+/// Defines the basic inputs for docker Job defined below
+open class JobInputs {
+
+  /// Version tag for docker image
+  dockerVersion: String(matches(aoeregex.SEMVER_REGEX)) = DOCKER_DEFAULT_VERSION
+
+  /// Overwrite the default docker hub image
+  customJobImage: String(!isBlank)|Null = null
+
+  /// Command arguments
+  args: Listing<String> = new {}
+}
+
+/// Mixin to modify the docker version of a job
+const function withDockerVersion(version: String(matches(aoeregex.SEMVER_REGEX))) = new Mixin<JobInputs> {
+  dockerVersion = version
+}
+
+/// Mixin to modify the docker image of a job
+const function withCustomImage(image: String(!isBlank)) = new Mixin<JobInputs> {
+  customJobImage = image
+}
+
+/// Mixin to clear default arguments that might have been defined by child implementations
+const function withClearDefaultArgs() = new Mixin<JobInputs> {
+  args = new {}
+}
+
+/// Mixin to add arguments
+const function withArg(arg: String) = new Mixin<JobInputs> {
+  args = super.args.toList().add(arg).toListing()
+}
+
+/// Defines an abstract job that from where other jobs can be extended from
+abstract class AbstractDockerJob extends AbstractJob {
+
+  /// Job inputs (parameters)
+  inputs: JobInputs = new {}
+
+  /// Defines the basic image to use
+  image = if (inputs.customJobImage != null)
+    inputs.customJobImage
+  else
+    gitlab.containerImage(DOCKER_HUB_REGISTRY_HOSTNAME, DOCKER_REPOSITORY_NAME, "\(inputs.dockerVersion)-cli")
+}
+
+/// Mixin to add arguments
+const function withPrintDockerInfo(enabled: Boolean) = new Mixin<AbstractDockerJob> {
+  before_script {
+    when (enabled) {
+      "docker info"
+    }
+  }
+}
+
+/// A generic  job
+class Job extends AbstractDockerJob {}
+
+/// Docker in docker service (dind)
+class DockerDinDService extends AbstractService {
+  inputs: JobInputs = new {}
+
+  name = gitlab.containerImage(DOCKER_HUB_REGISTRY_HOSTNAME, DOCKER_REPOSITORY_NAME, inputs.dockerVersion + "-dind")
+  pull_policy = "if-not-present"
+  alias = "docker"
+}
+
+/// Mixin to add docker in docker (DinD) service to a docker job
+const function withDockerInDockerService() = new Mixin<AbstractDockerJob> {
+  services {
+    new DockerDinDService { inputs = this.inputs }
+  }
+}

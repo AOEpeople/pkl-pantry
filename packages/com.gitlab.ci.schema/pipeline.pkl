@@ -1,0 +1,150 @@
+/// Module that provides the gitlab-ci schema itself (.gitlab-ci.yml)
+module com.gitlab.ci.schema.pipeline
+import "AbstractJob.pkl"
+import "AbstractService.pkl"
+import "Artifacts.pkl"
+import "Cache.pkl"
+import "Image.pkl"
+import "gitlab.pkl"
+
+/// Job inputs as hidden field to allow to reuse default for jobs and services
+hidden inputs: Typed?
+
+/// Can be `IncludeItem` or `IncludeItem[]`.
+/// Each `IncludeItem` will be a string, or an object with properties for the method if including external YAML file.
+/// The external content will be fetched, included and evaluated along the `.gitlab-ci.yml`.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#include).",
+include: gitlab.Includes? = new Listing<gitlab.IncludeItem> {
+  default = (_) -> new gitlab.IncludeItemLocal{}
+}
+
+/// Specifies the docker image to use for the job or globally for all jobs. Job configuration takes precedence
+/// over global setting. Requires a certain kind of Gitlab runner executor.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#image).
+image: gitlab.ContainerImageName|Image|Null = null
+
+/// Service that extend Abstract service to be used with the pipline
+class Service extends AbstractService
+
+/// Similar to `image` property, but will link the specified services to the `image` container.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#services).
+services: Listing<gitlab.ContainerImageName|AbstractService> = new Listing<AbstractService> {
+  default = (_) -> new Service {}
+}
+
+/// Defines scripts that should run *before* the job. Can be set globally or per job.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#before_script).
+before_script: gitlab.Script?
+
+/// Defines scripts that should run *after* the job. Can be set globally or per job.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#after_script).
+after_script: gitlab.Script?
+
+/// Defines default variables for all jobs. Job level property overrides global variables.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#variables).",
+variables: gitlab.GlobalVariables?
+
+/// Defining `cache` globally is deprecated. Use [`default`](https://docs.gitlab.com/ee/ci/yaml/#default) instead.
+/// [Learn more](https://docs.gitlab.com/ee/ci/yaml/#globally-defined-image-services-cache-before_script-after_script).
+cache: Cache?
+
+/// Groups jobs into stages. All jobs in one stage must complete before next stage is executed.
+/// Defaults to ['build', 'test', 'deploy']. [Learn More](https://docs.gitlab.com/ee/ci/yaml/#stages).
+stages: Listing<String|Listing<String>(!isEmpty && isDistinct)>(!isEmpty && isDistinct) = new Listing {
+  "build"
+  "test"
+  "deploy"
+}
+
+/// Specifies everything that goes into `default` on pipeline root
+class Default {
+
+  /// Specifies the default before_script block of a job
+  before_script: gitlab.Script?
+
+  /// Specifies the default after_script block of a job
+  after_script: gitlab.Script?
+
+  /// Used to specify a list of files and directories that should be attached to the job if it succeeds.
+  /// Artifacts are sent to Gitlab where they can be downloaded.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#artifacts).
+  artifacts: Artifacts?
+
+  /// Specifies lists of commands to execute on the runner at certain stages of job execution.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#hooks).
+  hooks: gitlab.Hooks?
+
+  /// Specifies the default cache settings for a job
+  cache: Cache?
+
+  /// Default image for jobs
+  image: gitlab.ContainerImageName?
+
+  /// Interruptible is used to indicate that a job should be canceled if made redundant by a newer pipeline run.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#interruptible)
+  interruptible: Boolean = false
+
+  /// Defines JWTs to be injected as environment variables.
+  id_tokens: gitlab.IDTokens?
+
+  /// Sets a workload identity (experimental), allowing automatic authentication with the external system.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#identity).
+  identity: gitlab.Identity?
+
+  /// Retry a job if it fails. Can be a simple integer or object definition.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#retry).
+  retry: gitlab.Retry?
+
+  /// Similar to `image` property, but will link the specified services to the `image` container.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#services).
+  services: Listing<String|AbstractService> = new Listing {
+    default = (_) -> new Service {}
+  }
+
+  /// Used to select runners from the list of available runners. A runner must have all tags listed here to run the job.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#tags).
+  tags: gitlab.Tags?
+
+  /// Allows you to configure a timeout for a specific job (e.g. `1 minute`, `1h 30m 12s`).
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/index.html#timeout).
+  timeout: String(length >= 1)?
+}
+
+/// Global job defaults
+default: Default?
+
+/// A special job used to upload static sites to Gitlab pages. Requires a `public/`
+/// directory with `artifacts.path` pointing to it.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#pages).
+pages: AbstractJob?
+
+/// A basic job that is extended from AbstractJob
+class Job extends AbstractJob
+
+/// A list of Jobs.
+/// The gitlab-ci jsonschema does not know this property, but it is required for PKL.
+/// Every job will be added to the output as top-level map to follow gitlabs jsonschema
+hidden jobs: Mapping<String, AbstractJob> = new Mapping {
+  default = (_) -> new Job {}
+}
+
+// Defines the output
+output {
+  text = "# File generated by pkl package com.gitlab.ci.schema. DO NOT EDIT.\n" + super.text
+  value = new Mapping {
+
+    // Add all key,value pairs like images,services etc.
+    ...module.toMap()
+
+    // Add all jobs to top-level
+    ...module.jobs
+  }
+  renderer = new YamlRenderer {
+    omitNullProperties = true
+
+    converters {
+      [Mapping] = (it) -> if (it.length == 0) null else it // prevent rendering empty maps
+      [Listing] = (it) -> if (it.length == 0) null else it // prevent rendering of empty lists
+    }
+  }
+}

@@ -1,0 +1,33 @@
+module commonProps
+
+import "pkl:reflect"
+import "pkl:Project" as proj
+
+// The base repository URL
+const repoUrl = "https://github.com/AOEPeople/pkl-pantry"
+
+// The base package URI. This is set to github pages domain.
+const packageBaseUri = "package://opensource.aoe.com/pkl-pantry"
+
+// List of authors
+const authors = new Listing<proj.EmailAddress>{
+  "Dominik Tomasi <dominik.tomasi@gmail.com>"
+}
+
+function getPackageZipURL(name: String, version: String): String =
+  "\(repoUrl)/releases/download/\(name)@\(version)/\(name)@\(version).zip"
+
+function getIssueTrackerURL(): String =
+  "\(repoUrl)/issues"
+
+function getSourceCodeURL(name: String, version: String): String =
+  "\(repoUrl)/tree/\(name)@\(version)/packages/\(name)"
+
+function getSourceCodeURLSchema(name: String, version: String): String =
+  "\(repoUrl)/blob/\(name)@\(version)/packages/\(name)%{path}#L%{line}-%{endLine}"
+
+// Function to find root module using reflection
+function findRootModule(mod: reflect.Module): Module =
+  let (supermodule = mod.supermodule)
+    if (supermodule == null || !supermodule.isAmend) mod.reflectee
+    else findRootModule(supermodule)

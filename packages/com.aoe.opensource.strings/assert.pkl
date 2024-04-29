@@ -1,0 +1,67 @@
+/// String assertion collection
+module com.aoe.opensource.strings.assert
+
+import "regex.pkl"
+
+//----------------------------------------------------------------------------------------------------------------------
+// Snake Case
+
+/// Checks if a given string is snake_case style
+function isSnakeCase(text: String): Boolean = text.matches(regex.SNAKE_CASE_REGEX)
+
+/// Checks if a given string is UPPER_SNAKE_CASE style
+function isUpperSnakeCase(text: String): Boolean = text.matches(regex.UPPPER_SNAKE_CASE_REGEX)
+
+/// Checks if a given string is snake_case style
+function isLowerSnakeCase(text: String): Boolean = text.matches(regex.LOWER_SNAKE_CASE_REGEX)
+
+//----------------------------------------------------------------------------------------------------------------------
+// Kebab Case
+
+/// Checks if a given string is KeBaB-CaSe style
+function isKebabCase(text: String): Boolean = text.matches(regex.KEBAB_CASE_REGEX)
+
+/// Checks if a given string is UPPER-KEBAB-CASE style
+function isUpperKebabCase(text: String): Boolean = text.matches(regex.UPPER_KEBAB_CASE_REGEX)
+
+/// Checks if a given string is kebab-case style
+function isLowerKebabCase(text: String): Boolean = text.matches(regex.LOWER_KEBAB_CASE_REGEX)
+
+//----------------------------------------------------------------------------------------------------------------------
+// Kebab Case
+
+/// Checks if a given string is dot.notation style
+function isDotNotation(text: String): Boolean = text.matches(regex.DOT_NOTATION_REGEX)
+
+/// Checks if a given string is DOT.NOTATION style
+function isUpperDotNotation(text: String): Boolean = text.matches(regex.UPPER_DOT_NOTATION_REGEX)
+
+/// Checks if a given string is DoT.nOtAtIoN style
+function isLowerDotNotation(text: String): Boolean = text.matches(regex.LOWER_DOT_NOTATION_REGEX)
+
+//----------------------------------------------------------------------------------------------------------------------
+// Camel Case
+
+/// Checks if a given string is camelCase style
+function isCamelCase(text: String): Boolean = text.matches(regex.CAMEL_CASE_REGEX)
+
+//----------------------------------------------------------------------------------------------------------------------
+// Pascal Case
+
+/// Checks if a given string is PascalCase style
+function isPascalCase(text: String): Boolean = text.matches(regex.PASCAL_CASE_REGEX)
+
+//----------------------------------------------------------------------------------------------------------------------
+// Special formats often used in templating
+
+/// Checks if a given string is a valid posix variable expression
+function isPosixVar(text: String): Boolean = text.matches(regex.POSIX_VAR_EXP_REGEX)
+
+/// Same as isPosixVar, but requires the curly braces
+function isSafePosixVar(text: String): Boolean = text.matches(regex.POSIX_SAFE_VAR_EXP_REGEX)
+
+/// Checks if a given string is a valid semver version
+function isSemver(text: String): Boolean = text.matches(regex.SEMVER_REGEX)
+
+/// Checks if a given string is a valid hostname
+function isHostname(text: String): Boolean = text.matches(regex.HOSTNAME_REGEX)

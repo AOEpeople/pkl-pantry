@@ -1,0 +1,14 @@
+module com.gitlab.ci.golang.examples.fmt
+
+amends "@gitlabci/pipeline.pkl"
+
+import ".../jobs/fmt.pkl" as gofmt
+import ".../golang.pkl"
+
+jobs {
+  ["basic"] = new gofmt.Job{}
+
+  ["with-custom-args"] = new gofmt.Job{
+    inputs = super.inputs |> golang.withClearDefaultArgs() |> golang.withArg("subfolder/dirty.go")
+  }
+}

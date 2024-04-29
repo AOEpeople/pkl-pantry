@@ -1,0 +1,33 @@
+module com.gitlab.ci.golang.examples.golang
+
+amends "@gitlabci/pipeline.pkl"
+
+import ".../golang.pkl"
+
+jobs {
+  ["basic"] = new golang.Job {
+    script {
+      "go env"
+    }
+  }
+
+  ["with-custom-version"] = new golang.Job {
+    inputs = super.inputs |> golang.withGoVersion("1.19")
+    script {
+      "go env"
+    }
+  }
+
+  ["with-custom-image"] = new golang.Job {
+    inputs = super.inputs |> golang.withCustomImage("registry.gitlab.com/golang:1.25")
+  }
+
+  ["with-print-go-env"] = new golang.Job {
+    before_script {
+      "login somewhere"
+    }
+    script {
+      "go and do someting"
+    }
+  } |> golang.withPrintGoEnv()
+}

@@ -1,0 +1,92 @@
+on:
+  workflow_dispatch:
+    inputs:
+      skipPublishCheck:
+        description: Skips the publish check for gradle build jobs
+        type: boolean
+        default: false
+  push:
+    paths:
+      - packages/**
+    branches:
+      - main
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Init Hermit
+        uses: cashapp/activate-hermit@v1
+        with:
+          cache: true
+      # language=shell script
+      - run: |
+          java --version
+          CI_SKIP_PUBLISH_CHECK=${{ inputs.skipPublishCheck }} ./gradlew build
+      - run: |
+          ls -R build/releases
+      - uses: actions/upload-artifact@v4
+        with:
+          path: build/releases/*
+          overwrite: true
+          retention-days: 1
+      - uses: EndBug/add-and-commit@v9
+        with:
+          add: docs/*
+          message: 'chore(generate): add generated metadata files'
+          push: true
+
+  list-releases:
+    runs-on: ubuntu-latest
+    needs: [ build]
+    outputs:
+      dirs: ${{ steps.dirs.outputs.dirs }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+      - id: dirs
+        # language=shell script
+        run: |
+          echo "dirs=$(ls -d artifact/* | jq --raw-input --slurp --compact-output 'split("\n")[:-1]')" >> ${GITHUB_OUTPUT}
+          cat ${GITHUB_OUTPUT}
+
+  release:
+    name: Release Matrix
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    needs: [ list-releases ]
+    defaults:
+      run:
+        working-directory: .
+    strategy:
+      matrix:
+        dir: ${{ fromJson(needs.list-releases.outputs.dirs) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Init Hermit
+        uses: cashapp/activate-hermit@v1
+        with:
+          cache: true
+      - uses: actions/download-artifact@v4
+      - name: Prepare release variables
+        id: prepare-release-variables
+        # language=shell script
+        run: |
+          echo "PACKAGE_FQN=$(basename ${{ matrix.dir }})" >> $GITHUB_OUTPUT
+          cat ${GITHUB_OUTPUT}
+      - uses: ncipollo/release-action@v1
+        with:
+          name: ${{ steps.prepare-release-variables.outputs.PACKAGE_FQN }}
+          tag: ${{ steps.prepare-release-variables.outputs.PACKAGE_FQN }}
+          allowUpdates: true
+          artifacts: "${{ matrix.dir }}/*"
+          removeArtifacts: true
+          replacesArtifacts: true
+
+  docs:
+    uses: ./.github/workflows/docs.yml
+    needs: [release]

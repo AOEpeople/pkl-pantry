@@ -1,0 +1,13 @@
+module com.gitlab.ci.docker.examples.build
+
+amends "@gitlabci/pipeline.pkl"
+
+import ".../jobs/build.pkl"
+import ".../docker.pkl"
+import "@gitlabci/mixins/job.pkl" as jobmixin
+
+jobs {
+  ["build"] = new build.Job {}
+  |> docker.withPrintDockerInfo(true)
+  |> jobmixin.withDependencyProxy(true)
+}

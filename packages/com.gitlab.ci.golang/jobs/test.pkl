@@ -1,0 +1,33 @@
+/// Module that provides a configurable golang test job
+module com.gitlab.ci.golang.jobs.test
+
+import ".../golang.pkl"
+
+/// Input class for test jobs
+class JobInputs extends golang.JobInputs {
+
+  /// Enables verbose output for tests (-v)
+  verbose: Boolean = false
+
+  /// Enables race detection for tests (-race)
+  race: Boolean = false
+}
+
+/// Mixin to enabled verbose output
+const function withVerboseOutput() = new Mixin<JobInputs> {
+  verbose = true
+}
+
+/// Mixin to enabled race detection
+const function withRaceDetection() = new Mixin<JobInputs> {
+  race = true
+}
+
+/// Golang test job
+class Job extends golang.AbstractGolangJob {
+  // noinspection TypeMismatch
+  inputs: JobInputs = new JobInputs {} |> golang.withArg("./...")
+  script {
+    "go test\(if (inputs.verbose) " -v" else "")\(if (inputs.race) " -race" else "") \(inputs.args.join(" "))"
+  }
+}

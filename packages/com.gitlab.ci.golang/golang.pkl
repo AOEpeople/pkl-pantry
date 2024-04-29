@@ -1,0 +1,70 @@
+module com.gitlab.ci.golang
+
+import "@gitlabci/AbstractJob.pkl"
+import "@gitlabci/gitlab.pkl"
+import "@aoestrings/regex.pkl" as aoeregex
+
+/// Docker-Hub registry host name
+const DockerHubRegistry = "docker.io"
+
+/// Golang Docker-Hub repository
+const DockerHubRepository = "library/golang"
+
+/// Default golang version (image tag)
+const DefaultGolangVersion = "1.22"
+
+/// Defines the basic inputs for golang Job defined below
+open class JobInputs {
+
+  /// Version tag for golang image
+  goVersion: String(matches(aoeregex.SEMVER_REGEX)) = DefaultGolangVersion
+
+  /// Overwrite the default docker hub image
+  customImage: String(!isBlank)|Null = null
+
+  /// Command arguments
+  args: Listing<String> = new {}
+}
+
+/// Mixin to modify the golang version of a job
+const function withGoVersion(version: String(matches(aoeregex.SEMVER_REGEX))) = new Mixin<JobInputs> {
+  goVersion = version
+}
+
+/// Mixin to modify the golang image of a job
+const function withCustomImage(image: String(!isBlank)) = new Mixin<JobInputs> {
+  customImage = image
+}
+
+/// Mixin to clear default arguments that might have been defined by child implementations
+const function withClearDefaultArgs() = new Mixin<JobInputs> {
+  args = new {}
+}
+
+/// Mixin to add arguments
+const function withArg(arg: String) = new Mixin<JobInputs> {
+  args = super.args.toList().add(arg).toListing()
+}
+
+/// Defines an abstract job that from where other jobs can be extended from
+abstract class AbstractGolangJob extends AbstractJob {
+
+  /// Job inputs (parameters)
+  inputs: JobInputs = new {}
+
+  /// Defines the basic golang image to use
+  image = if (inputs.customImage != null)
+    inputs.customImage
+  else
+    gitlab.containerImage(DockerHubRegistry, DockerHubRepository, inputs.goVersion)
+}
+
+/// Mixin to add arguments
+const function withPrintGoEnv() = new Mixin<AbstractGolangJob> {
+  before_script {
+    "go env"
+  }
+}
+
+/// A generic golang job
+class Job extends AbstractGolangJob {}

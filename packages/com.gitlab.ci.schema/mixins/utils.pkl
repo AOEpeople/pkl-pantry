@@ -1,0 +1,15 @@
+module com.gitlab.ci.mixins.internal.utils
+
+// Mixin variables
+local const dockerHubHostname = "docker.io"
+local const dockerHubLibraryPrefix = "library"
+local const gitlabDependencyProxyPrefix = "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}"
+
+// Internal function
+const function adjustImagePrefixForDependencyProxy(image: String, enabled: Boolean): String =
+  if (enabled && image.startsWith("\(dockerHubHostname)/\(dockerHubLibraryPrefix)"))
+    image.replaceFirst("\(dockerHubHostname)/\(dockerHubLibraryPrefix)", gitlabDependencyProxyPrefix)
+  else if (enabled && image.startsWith(dockerHubHostname))
+    image.replaceFirst(dockerHubHostname, gitlabDependencyProxyPrefix)
+  else
+    image

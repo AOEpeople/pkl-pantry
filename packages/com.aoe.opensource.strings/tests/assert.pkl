@@ -1,0 +1,207 @@
+module com.aoe.opensource.tests.assert
+
+amends "pkl:test"
+
+import ".../assert.pkl"
+
+local snakeCase = "SnAkE_CaSe"
+local upperSnakeCase = "UPPER_SNAKE_CASE"
+local lowerSnakeCase = "snake_case"
+local kebabCase = "KeBaB-CaSe"
+local upperKebabCase = "UPPER-KEBAB-CASE"
+local lowerKebabCase = "kebab-case"
+local dotNotation = "DoT.nOtAtIoN"
+local upperDotNotation = "DOT.NOTATION"
+local lowerDotNotation = "dot.notation"
+local camelCase = "camelCase"
+local pascalCase = "PascalCase"
+
+facts {
+  ["isSnakeCase"] {
+    assert.isSnakeCase(snakeCase)
+    assert.isSnakeCase(upperSnakeCase)
+    assert.isSnakeCase(lowerSnakeCase)
+    !assert.isSnakeCase(kebabCase)
+    !assert.isSnakeCase(upperKebabCase)
+    !assert.isSnakeCase(lowerKebabCase)
+    !assert.isSnakeCase(dotNotation)
+    !assert.isSnakeCase(upperDotNotation)
+    !assert.isSnakeCase(lowerDotNotation)
+    !assert.isSnakeCase(camelCase)
+    !assert.isSnakeCase(pascalCase)
+  }
+
+  ["isUpperSnakeCase"] {
+    !assert.isUpperSnakeCase(snakeCase)
+    assert.isUpperSnakeCase(upperSnakeCase)
+    !assert.isUpperSnakeCase(lowerSnakeCase)
+    !assert.isUpperSnakeCase(kebabCase)
+    !assert.isUpperSnakeCase(upperKebabCase)
+    !assert.isUpperSnakeCase(lowerKebabCase)
+    !assert.isUpperSnakeCase(dotNotation)
+    !assert.isUpperSnakeCase(upperDotNotation)
+    !assert.isUpperSnakeCase(lowerDotNotation)
+    !assert.isUpperSnakeCase(camelCase)
+    !assert.isUpperSnakeCase(pascalCase)
+  }
+
+  ["isLowerSnakeCase"] {
+    !assert.isLowerSnakeCase(snakeCase)
+    !assert.isLowerSnakeCase(upperSnakeCase)
+    assert.isLowerSnakeCase(lowerSnakeCase)
+    !assert.isLowerSnakeCase(kebabCase)
+    !assert.isLowerSnakeCase(upperKebabCase)
+    !assert.isLowerSnakeCase(lowerKebabCase)
+    !assert.isLowerSnakeCase(dotNotation)
+    !assert.isLowerSnakeCase(upperDotNotation)
+    !assert.isLowerSnakeCase(lowerDotNotation)
+    !assert.isLowerSnakeCase(camelCase)
+    !assert.isLowerSnakeCase(pascalCase)
+  }
+
+  ["isKebabCase"] {
+    !assert.isKebabCase(snakeCase)
+    !assert.isKebabCase(upperSnakeCase)
+    !assert.isKebabCase(lowerSnakeCase)
+    assert.isKebabCase(kebabCase)
+    assert.isKebabCase(upperKebabCase)
+    assert.isKebabCase(lowerKebabCase)
+    !assert.isKebabCase(dotNotation)
+    !assert.isKebabCase(upperDotNotation)
+    !assert.isKebabCase(lowerDotNotation)
+    !assert.isKebabCase(camelCase)
+    !assert.isKebabCase(pascalCase)
+  }
+
+  ["isUpperKebabCase"] {
+    !assert.isUpperKebabCase(snakeCase)
+    !assert.isUpperKebabCase(upperSnakeCase)
+    !assert.isUpperKebabCase(lowerSnakeCase)
+    !assert.isUpperKebabCase(kebabCase)
+    assert.isUpperKebabCase(upperKebabCase)
+    !assert.isUpperKebabCase(lowerKebabCase)
+    !assert.isUpperKebabCase(dotNotation)
+    !assert.isUpperKebabCase(upperDotNotation)
+    !assert.isUpperKebabCase(lowerDotNotation)
+    !assert.isUpperKebabCase(camelCase)
+    !assert.isUpperKebabCase(pascalCase)
+  }
+
+  ["isLowerKebabCase"] {
+    !assert.isLowerKebabCase(snakeCase)
+    !assert.isLowerKebabCase(upperSnakeCase)
+    !assert.isLowerKebabCase(lowerSnakeCase)
+    !assert.isLowerKebabCase(kebabCase)
+    !assert.isLowerKebabCase(upperKebabCase)
+    assert.isLowerKebabCase(lowerKebabCase)
+    !assert.isLowerKebabCase(dotNotation)
+    !assert.isLowerKebabCase(upperDotNotation)
+    !assert.isLowerKebabCase(lowerDotNotation)
+    !assert.isLowerKebabCase(camelCase)
+    !assert.isLowerKebabCase(pascalCase)
+  }
+
+  ["isDotNotation"] {
+    !assert.isDotNotation(snakeCase)
+    !assert.isDotNotation(upperSnakeCase)
+    !assert.isDotNotation(lowerSnakeCase)
+    !assert.isDotNotation(kebabCase)
+    !assert.isDotNotation(upperKebabCase)
+    !assert.isDotNotation(lowerKebabCase)
+    assert.isDotNotation(dotNotation)
+    assert.isDotNotation(upperDotNotation)
+    assert.isDotNotation(lowerDotNotation)
+    !assert.isDotNotation(camelCase)
+    !assert.isDotNotation(pascalCase)
+  }
+
+  ["isUpperDotNotation"] {
+    !assert.isUpperDotNotation(snakeCase)
+    !assert.isUpperDotNotation(upperSnakeCase)
+    !assert.isUpperDotNotation(lowerSnakeCase)
+    !assert.isUpperDotNotation(kebabCase)
+    !assert.isUpperDotNotation(upperKebabCase)
+    !assert.isUpperDotNotation(lowerKebabCase)
+    !assert.isUpperDotNotation(dotNotation)
+    assert.isUpperDotNotation(upperDotNotation)
+    !assert.isUpperDotNotation(lowerDotNotation)
+    !assert.isUpperDotNotation(camelCase)
+    !assert.isUpperDotNotation(pascalCase)
+  }
+
+  ["isLowerDotNotation"] {
+    !assert.isLowerDotNotation(snakeCase)
+    !assert.isLowerDotNotation(upperSnakeCase)
+    !assert.isLowerDotNotation(lowerSnakeCase)
+    !assert.isLowerDotNotation(kebabCase)
+    !assert.isLowerDotNotation(upperKebabCase)
+    !assert.isLowerDotNotation(lowerKebabCase)
+    !assert.isLowerDotNotation(dotNotation)
+    !assert.isLowerDotNotation(upperDotNotation)
+    assert.isLowerDotNotation(lowerDotNotation)
+    !assert.isLowerDotNotation(camelCase)
+    !assert.isLowerDotNotation(pascalCase)
+  }
+
+  ["isCamelCase"] {
+    !assert.isCamelCase(snakeCase)
+    !assert.isCamelCase(upperSnakeCase)
+    !assert.isCamelCase(lowerSnakeCase)
+    !assert.isCamelCase(kebabCase)
+    !assert.isCamelCase(upperKebabCase)
+    !assert.isCamelCase(lowerKebabCase)
+    assert.isCamelCase(camelCase)
+    !assert.isCamelCase(pascalCase)
+  }
+
+  ["isPascalCase"] {
+    !assert.isPascalCase(snakeCase)
+    !assert.isPascalCase(upperSnakeCase)
+    !assert.isPascalCase(lowerSnakeCase)
+    !assert.isPascalCase(kebabCase)
+    !assert.isPascalCase(upperKebabCase)
+    !assert.isPascalCase(lowerKebabCase)
+    !assert.isPascalCase(camelCase)
+    assert.isPascalCase(pascalCase)
+  }
+
+  ["isPosixVar"] {
+    assert.isPosixVar("$0")
+    assert.isPosixVar("${0}")
+    assert.isPosixVar("$VAR")
+    assert.isPosixVar("$VAR_TEST")
+    assert.isPosixVar("${VAR}")
+    assert.isPosixVar("${VAR_TEST}")
+    assert.isPosixVar("${VAR:-default}")
+
+    !assert.isPosixVar("foo")
+    !assert.isPosixVar("foo_bar")
+  }
+
+  ["isSafePosixVar"] {
+    !assert.isSafePosixVar("$0")
+    assert.isSafePosixVar("${0}")
+    !assert.isSafePosixVar("$VAR")
+    !assert.isSafePosixVar("$VAR_TEST")
+    assert.isSafePosixVar("${VAR}")
+    assert.isSafePosixVar("${VAR_TEST}")
+    assert.isSafePosixVar("${VAR:-default}")
+
+    !assert.isSafePosixVar("foo")
+    !assert.isSafePosixVar("foo_bar")
+  }
+
+  ["isSemver"] {
+    assert.isSemver("0.1.0")
+    assert.isSemver("1.5")
+    assert.isSemver("1.0.1-alpha.1")
+  }
+
+  ["isHostname"] {
+    assert.isHostname("localhost")
+    assert.isHostname("github.com")
+    assert.isHostname("registry.gitlab.com")
+
+    !assert.isHostname("https://foo.bar")
+  }
+}

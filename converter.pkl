@@ -1,0 +1,16 @@
+import "pkl:json"
+import "pkl:yaml"
+
+filePath = read("prop:file")
+file = read("file:" + filePath)
+parsed =
+  if (filePath.endsWith(".json"))
+    new json.Parser {}.parse(file)
+  else if (filePath.endsWith(".yaml") || filePath.endsWith(".yml"))
+    new yaml.Parser {}.parse(file)
+  else
+    throw("Unsupported file format")
+
+output {
+  value = parsed
+}

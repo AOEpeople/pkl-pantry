@@ -1,0 +1,31 @@
+module com.gitlab.ci.golang.examples.test
+
+amends "@gitlabci/pipeline.pkl"
+
+import ".../jobs/test.pkl" as gotest
+import ".../golang.pkl"
+
+jobs {
+  ["basic"] = new gotest.Job {}
+
+  ["with-custom-version"] = new gotest.Job {
+    inputs = super.inputs |> golang.withGoVersion("1.15")
+  }
+
+  ["with-custom-args"] = new gotest.Job {
+    inputs = super.inputs |> golang.withClearDefaultArgs() |> golang.withArg("./test.go")
+  }
+  ["with-verbose-output"] = new gotest.Job {
+    inputs = super.inputs |> gotest.withVerboseOutput()
+  }
+  ["with-race-detection"] = new gotest.Job {
+    inputs = super.inputs |> gotest.withRaceDetection()
+  }
+  ["with-all-mixins"] = new gotest.Job {
+    inputs = super.inputs
+      |> golang.withGoVersion("1.15")
+      |> golang.withClearDefaultArgs() |> golang.withArg("./test.go")
+      |> gotest.withVerboseOutput()
+      |> gotest.withRaceDetection()
+  }
+}

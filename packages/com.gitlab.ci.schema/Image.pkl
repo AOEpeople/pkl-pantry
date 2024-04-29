@@ -1,0 +1,28 @@
+/// Specifies the docker image to use for the job or globally for all jobs. Job configuration takes precedence
+/// over global setting. Requires a certain kind of Gitlab runner executor.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#image).
+@ModuleInfo { minPklVersion = "0.25.1" }
+module com.gitlab.ci.schema.Image
+
+import "gitlab.pkl"
+
+/// Full name of the image that should be used. It should contain the Registry part if needed.
+name: gitlab.ContainerImageName
+
+/// Command or script that should be executed as the container's entrypoint.
+/// It will be translated to Docker's --entrypoint option while creating the container.
+/// The syntax is similar to Dockerfile's ENTRYPOINT directive, where each shell token
+/// is a separate string in the array.",
+entrypoint: gitlab.ContainerEntrypoint?
+
+/// Options to pass to Runners Docker Executor.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#imagedocker)
+docker: gitlab.ContainerDockerOptions?
+
+/// Specifies how to pull the image in Runner. It can be one of `always`, `never` or `if-not-present`.
+/// The default value is `always`. [Learn more](https://docs.gitlab.com/ee/ci/yaml/#imagepull_policy).
+pull_policy: gitlab.ContainerImagePullPolicy = "always"
+
+/// Function to set name of the image
+function setImageName(_image: String) =
+  this.toMap().put("name", _image).toTyped(module.getClass())

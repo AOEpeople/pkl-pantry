@@ -1,0 +1,12 @@
+amends ".../basePklProject.pkl"
+
+package {
+  version = "0.1.0"
+  description = """
+    Package that provides the schema for GitlabCI
+    """
+}
+
+dependencies {
+  ["aoestrings"] = import("../com.aoe.opensource.strings/PklProject")
+}

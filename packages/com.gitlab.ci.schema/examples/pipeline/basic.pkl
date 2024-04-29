@@ -1,0 +1,61 @@
+module com.gitlab.ci.schema.examples.pipeline.basic
+amends ".../pipeline.pkl"
+
+import ".../AbstractJob.pkl"
+import ".../AbstractService.pkl"
+import ".../gitlab.pkl"
+import ".../mixins/job.pkl" as jobmixin
+
+/// Example on how to extend from AbstractService
+local class PostgresService extends AbstractService {
+  name = gitlab.dockerHubImage("postgres", "14-bookworm")
+  pull_policy = "if-not-present"
+}
+
+/// Services
+services {
+  new PostgresService {} // Example of a predifined service
+  (gitlab.dockerHubImage("docker", "dind-rootless")) // A simple service that just provides a image name
+}
+
+local open class GolangJobInputs {
+  goVersion: String = "1.22"
+}
+
+/// Example of how to extend jobs for special needs
+local class GolangJob extends AbstractJob {
+  inputs: GolangJobInputs = new {}
+  image = gitlab.dockerHubImage("golang", "1.12")
+}
+
+/// Jobs
+jobs {
+
+  // A Simple job
+  ["foo"] = new Job {
+    image = gitlab.containerImage(
+      "registry.gitlab.com",
+      "group-name/repo-name/image-name",
+      "latest"
+    )
+    script {
+      "echo \"Hello\""
+        """
+        echo "Hello World!!
+        echo "Second line"
+        """
+    }
+  } |> jobmixin.withPrintEnv(true)
+
+  local otherScripts = new Listing<String>{
+    "some script"
+  }
+  // Job the uses the extended GolangJob class
+  ["bar"] = new GolangJob {
+    inputs {}
+    script {
+      ...otherScripts
+      "printenv"
+    }
+  }
+}

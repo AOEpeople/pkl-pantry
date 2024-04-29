@@ -1,0 +1,22 @@
+module com.gitlab.ci.golang.examples.build
+
+amends "@gitlabci/pipeline.pkl"
+
+import ".../jobs/build.pkl" as gobuild
+import ".../golang.pkl"
+
+jobs {
+  ["basic"] = new gobuild.Job {}
+
+  ["with-custom-version"] = new gobuild.Job{
+    inputs = super.inputs |> golang.withGoVersion("1.15")
+  }
+
+  ["with-custom-main.go"] = new gobuild.Job{
+    inputs = super.inputs |> gobuild.withMainFile("subfolder/main.go")
+  }
+
+  ["with-custom-output"] = new gobuild.Job{
+    inputs = super.inputs |> gobuild.withOutFile("dist/app")
+  }
+}

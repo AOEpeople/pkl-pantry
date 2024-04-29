@@ -1,0 +1,14 @@
+module com.gitlab.ci.golang.examples.vet
+
+amends "@gitlabci/pipeline.pkl"
+
+import ".../jobs/vet.pkl" as govet
+import ".../golang.pkl"
+
+jobs {
+  ["basic"] = new govet.Job{}
+
+  ["with-custom-args"] = new govet.Job{
+    inputs = super.inputs |> golang.withClearDefaultArgs() |> golang.withArg("subfolder/invalid.go")
+  }
+}

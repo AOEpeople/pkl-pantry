@@ -1,0 +1,104 @@
+@ModuleInfo { minPklVersion = "0.25.3" }
+module com.aoe.opensource.oci.ContainerImage
+
+/// Separator for image path
+const PATH_SEPARATOR = "/"
+
+/// Separator for image tags
+const TAG_SEPARATOR = ":"
+
+/// Separator for image digests
+const DIGEST_SEPARATOR = "@"
+
+/// The group that is used as default by docker, if no is specified
+/// Example:
+///   golang:latest -> docker.io/library/golang:latest
+const DOCKER_HUB_LIBRARY_GROUP = "library"
+
+/// Regular expression for full qualified image name
+/// Examples:
+///   docker.io/library/scratch
+///   docker.io/library/scratch:latest
+///   docker.io/library/scratch@sha256:8bce67040cd0ae39e0beb55bcb976a824d9966d2ac8d2e4bf6119b45505cee64
+///
+const FQN_REGEX = Regex(#"(?<registry>[a-z0-9]+[a-z0-9\._+-]+)\/(?<repository>[a-z0-9]+\/[a-z0-9\/]*)(?:\:(?<tag>[a-z0-9]+))*(?:\@(?<digest>[a-z0-9\:]+))*"#)
+
+/// Image registry
+registry: String = "docker.io"
+
+/// Image repository
+repository: String = "\(DOCKER_HUB_LIBRARY_GROUP)/scratch"
+
+/// Image tag
+tag: String = "latest"
+
+/// Image digest
+digest: String = ""
+
+// builds the image string
+local function buildString(separator: String, tagOrDigest: String): String =
+  "\(registry)/\(repository)\(separator)\(tagOrDigest)"
+
+/// Returns the image as string
+function toString(): String =
+  if (digest.length > 0)
+    buildString(DIGEST_SEPARATOR, digest)
+  else
+    buildString(TAG_SEPARATOR, tag)
+
+// Removes the tag from given string
+local function stripTag(input: String): String =
+  input.split(TAG_SEPARATOR)[0]
+
+// Removes the digest from given string
+local function stripDigest(input: String): String =
+  input.split(DIGEST_SEPARATOR)[0]
+
+// Combines all clean functions
+local function cleanImageName(input: String): String = stripDigest(stripTag(input))
+
+// Add the digest to ContainerImage instance if present
+function _addDigest(imageName: String): module =
+  let (digestParts = imageName.split(DIGEST_SEPARATOR))
+    if (digestParts.length == 2)
+      this.toMap().put("digest", digestParts[1]).toTyped(module.getClass())
+    else
+      this
+
+// Adds the tag to ContainerImage instance if present
+function _addTag(imageName: String): module =
+  let (tagParts = imageName.split(TAG_SEPARATOR))
+    if (tagParts.length == 2)
+      this.toMap().put("tag", tagParts[1]).toTyped(module.getClass())
+    else
+      this
+
+// Sets registry and repository from string
+function _imageFromString(imageName: String): module =
+  let (nameParts = imageName.split(PATH_SEPARATOR))
+    // imageName is just "golang" or "python", so we create a docker.io image string
+    // golang -> docker.io/library/golang:latest
+    if (nameParts.length == 1)
+      this.toMap()
+        .put("repository", "\(DOCKER_HUB_LIBRARY_GROUP)/\(cleanImageName(nameParts[0]))")
+        .toTyped(module.getClass())
+
+    // imageName is a combination of group and name
+    // apple/pkl -> docker.io/apple/pkl:latest
+    else if (nameParts.length == 2)
+      this.toMap()
+        .put("repository", "\(nameParts[0])/\(cleanImageName(nameParts[1]))")
+        .toTyped(module.getClass())
+
+    // imageName is a fully qualified name (ghcr.io/aoe/scratch[:tag][@digest])
+    else if (nameParts.length > 2)
+      this.toMap()
+        .put("registry", nameParts[0])
+        .put("repository", cleanImageName(nameParts.drop(1).join(PATH_SEPARATOR)))
+        .toTyped(module.getClass())
+
+    else throw("unable to create ContainerImage instance from '\(imageName)'")
+
+/// Assignes module properties from given string
+function fromString(imageName: String): module =
+  this._imageFromString(imageName)._addTag(imageName)._addDigest(imageName)

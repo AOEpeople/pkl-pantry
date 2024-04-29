@@ -1,0 +1,124 @@
+/// Module that provides a configurable docker build job
+module com.gitlab.ci.docker.jobs.build
+
+import ".../docker.pkl"
+import "@oci/ContainerImage.pkl"
+import "@oci/ImageAnnotation.pkl"
+import "@gitlabci/gitlab.pkl"
+
+/// Input class for build jobs
+class JobInputs extends docker.JobInputs {
+
+  /// Docker context path
+  contextPath: String = "."
+
+  /// Path to Dockerfile
+  dockerFilePath: String = "Dockerfile"
+
+  /// Platforms to build for
+  targetPlatforms: Listing<String> = new {
+    "linux/amd64"
+    "linux/arm64"
+  }
+
+  /// Specifies the image that will be created by this build job
+  image: ContainerImage = new {
+    registry = gitlab.ciVar("Registry")
+    repository = gitlab.ciVar("ProjectPath")
+    tag = gitlab.ciVar("CommitShortSHA")
+  }
+
+  /// Image metadata
+  annotations: Listing<ImageAnnotation> = new {
+    new {
+      name = "title"
+      value = gitlab.ciVar("ProjectName")
+    }
+    new {
+      name = "description"
+      value = gitlab.ciVar("ProjectTitle")
+    }
+    new {
+      name = "created"
+      value = "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+    }
+    new {
+      name = "source"
+      value = gitlab.ciVar("ProjectURL")
+    }
+    new {
+      name = "revision"
+      value = gitlab.ciVar("CommitShortSHA")
+    }
+    new {
+      name = "ref.name"
+      value = gitlab.ciVar("CommitRefSlug")
+    }
+  }
+
+  /// Wether or not to use inline, image based, caching
+  cachingEnabled: Boolean = true
+
+  /// Image tag used for cache image
+  cacheImageTag: String = gitlab.ciVar("CommitRefSlug")
+
+  /// Additional args passed to docker buildx command
+  args {
+    "--progress=\"plain\""
+    "--pull"
+    "--push"
+  }
+}
+
+/// Docker build job
+class Job extends docker.AbstractDockerJob {
+  inputs: JobInputs = new {
+
+  }
+  stage = "build"
+  cache {
+    key = "docker-apk"
+    policy = "pull-push"
+    paths {
+      "/var/cache/apk"
+    }
+  }
+  services {
+    new docker.DockerDinDService {}
+  }
+
+  before_script {
+    "apk add git curl"
+    "docker context create tls-environment"
+    "docker buildx create --name multiarch --driver docker-container --use tls-environment"
+    "docker buildx inspect --bootstrap"
+    gitlab.GITLAB_REGISTRY_LOGIN_CMD
+  }
+
+  // Listing of commands to be joined in script block
+  local scripBuilder: Listing<String> = new {
+    "docker buildx build \(inputs.contextPath)"
+    "--file \(inputs.dockerFilePath)"
+    "--platform=\(inputs.targetPlatforms.join(","))"
+    "--tag \(inputs.image.toString())"
+
+    // OCI Annotations
+    for (annotation in inputs.annotations) {
+      "--label \"\(annotation.toString())\""
+    }
+
+    // Add this when caching is enabled
+    local cacheImageName = inputs.image.toString().replaceLast(":" + inputs.image.tag, ":" + inputs.cacheImageTag)
+    when (inputs.cachingEnabled) {
+      "--cache-from type=\"registry,ref=\(cacheImageName)\" --cache-to=type=inline"
+      "--tag \(cacheImageName)"
+    }
+
+    // Add all arguments
+    inputs.args.join(" ")
+  }
+
+  script {
+    scripBuilder.join(" \\\n")
+  }
+}

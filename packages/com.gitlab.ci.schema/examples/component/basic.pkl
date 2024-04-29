@@ -1,0 +1,27 @@
+module com.gitlab.ci.schema.examples.component.basic
+amends ".../component.pkl"
+
+import ".../gitlab.pkl"
+
+spec {
+  inputs {
+    ["job-image-tag"] {
+      default = "latest"
+      description = "A input variable"
+    }
+  }
+}
+
+component {
+  jobs {
+    ["my-component"] = new Job {
+      image = gitlab.dockerHubImage(
+        "debian",
+        spec.input("my-image-tag")
+      )
+      script {
+        "printenv"
+      }
+    }
+  }
+}

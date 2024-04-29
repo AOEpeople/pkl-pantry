@@ -1,0 +1,49 @@
+module com.aoe.opensource.testing.examples.bool
+
+amends "pkl:test"
+
+import ".../ContainerImage.pkl"
+
+facts {
+  ["new ContainerImage"] {
+    new ContainerImage {}.toString() == "docker.io/library/scratch:latest"
+  }
+  ["new ContainerImage fromString"] {
+
+    new ContainerImage {}.fromString("scratch").toString()
+    == "docker.io/library/scratch:latest"
+
+    new ContainerImage {}.fromString("scratch:latest").toString()
+    == "docker.io/library/scratch:latest"
+
+    new ContainerImage {}.fromString("scratch:stable").toString()
+    == "docker.io/library/scratch:stable"
+
+    new ContainerImage {}.fromString("scratch@sha256:8bce67040cd0ae39e0beb55bcb976a824d9966d2ac8d2e4bf6119b45505cee64").toString()
+    == "docker.io/library/scratch@sha256:8bce67040cd0ae39e0beb55bcb976a824d9966d2ac8d2e4bf6119b45505cee64"
+
+    new ContainerImage{}.fromString("aoe/scratch").toString()
+    == "docker.io/aoe/scratch:latest"
+
+    new ContainerImage{}.fromString("aoe/scratch:latest").toString()
+    == "docker.io/aoe/scratch:latest"
+
+    new ContainerImage{}.fromString("aoe/scratch:stable").toString()
+    == "docker.io/aoe/scratch:stable"
+
+    new ContainerImage{}.fromString("aoe/scratch@sha256:8bce67040cd0ae39e0beb55bcb976a824d9966d2ac8d2e4bf6119b45505cee64").toString()
+    == "docker.io/aoe/scratch@sha256:8bce67040cd0ae39e0beb55bcb976a824d9966d2ac8d2e4bf6119b45505cee64"
+
+    new ContainerImage{}.fromString("ghcr.io/aoe/scratch").toString()
+    == "ghcr.io/aoe/scratch:latest"
+
+    new ContainerImage{}.fromString("ghcr.io/aoe/scratch:latest").toString()
+    == "ghcr.io/aoe/scratch:latest"
+
+    new ContainerImage{}.fromString("ghcr.io/aoe/scratch:stable").toString()
+    == "ghcr.io/aoe/scratch:stable"
+
+    new ContainerImage{}.fromString("ghcr.io/aoe/scratch@sha256:8bce67040cd0ae39e0beb55bcb976a824d9966d2ac8d2e4bf6119b45505cee64").toString()
+    == "ghcr.io/aoe/scratch@sha256:8bce67040cd0ae39e0beb55bcb976a824d9966d2ac8d2e4bf6119b45505cee64"
+  }
+}

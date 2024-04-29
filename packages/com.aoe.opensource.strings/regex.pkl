@@ -1,0 +1,67 @@
+/// Collection of regular expressions
+module com.aoe.opensource.strings.regex
+
+//----------------------------------------------------------------------------------------------------------------------
+// Snake Case
+
+/// Regex matching snake case strings ( snake_case )
+const LOWER_SNAKE_CASE_REGEX = Regex(#"^[a-z\d]+(?:_[a-z\d]+)+$"#)
+
+/// Regex matching upper snake case strings ( UPPER_SNAKE_CASE )
+const UPPPER_SNAKE_CASE_REGEX = Regex(#"^[A-Z\d]+(?:_[A-Z\d]+)+$"#)
+
+/// Regex matching mixed snake case strings ( MiXeD_SnAkE_CaSe )
+const SNAKE_CASE_REGEX = Regex(#"^[a-zA-Z\d]+(?:_[a-zA-Z\d]+)+$"#)
+
+//----------------------------------------------------------------------------------------------------------------------
+// Kebab Case
+
+/// Regex matching kebab case strings ( kebab-case )
+const LOWER_KEBAB_CASE_REGEX = Regex(#"^[a-z\d]+(?:-[a-z\d]+)+$"#)
+
+/// Regex matching upper kebab case strings ( UPPER-KEBAB-CASE )
+const UPPER_KEBAB_CASE_REGEX = Regex(#"^[A-Z\d]+(?:-[A-Z\d]+)+$"#)
+
+/// Regex matching mixed kebab case style ( "MiXeD-KeBaB-CaSe" )
+const KEBAB_CASE_REGEX = Regex(#"^[a-zA-Z\d]+(?:-[a-zA-Z\d]+)+$"#)
+
+//----------------------------------------------------------------------------------------------------------------------
+// Dot notation
+
+/// Regex matching lower dot notation strings ( dot.notation )
+const LOWER_DOT_NOTATION_REGEX = Regex(#"^[a-z\d]+(?:\.[a-z\d]+)+$"#)
+
+/// Regex matching upper dot notation strings ( DOT.NOTATION )
+const UPPER_DOT_NOTATION_REGEX = Regex(#"^[A-Z\d]+(?:\.[A-Z\d]+)+$"#)
+
+/// Regex matching dot notation strings ( DoT.nOtAtIoN )
+const DOT_NOTATION_REGEX = Regex(#"^[a-zA-Z\d]+(?:\.[a-zA-Z\d]+)+$"#)
+
+//----------------------------------------------------------------------------------------------------------------------
+// Camel Case
+
+/// Regex matching camel case strings ( camelCase )
+const CAMEL_CASE_REGEX = Regex(#"^[a-z]+[a-z0-9]+[A-Z](?!_-\s)[a-zA-Z0-9]*$"#)
+
+//----------------------------------------------------------------------------------------------------------------------
+// Pascal Case
+
+/// Regex matching pascal case strings ( PascalCase )
+const PASCAL_CASE_REGEX = Regex(#"^[A-Z]+[a-zA-Z0-9]+(?!_-\s)[a-zA-Z0-9]*$"#)
+
+//----------------------------------------------------------------------------------------------------------------------
+// Special formats often used in templating
+
+/// Regex matching environment variable notation
+/// The folloing expressions are covered:
+/// $VAR_1, ${VAR_2}, ${VAR_3:-word}, ${VAR_4:=abc}, $0, $@, $?
+const POSIX_VAR_EXP_REGEX = Regex(#"^\$\{?[a-zA-Z0-9@?=:+#%_-]+}?$"#)
+
+/// Same as POSIX_VAR_EXP_REGEX, but requires the curly braces.
+const POSIX_SAFE_VAR_EXP_REGEX = Regex(#"^\$\{[a-zA-Z0-9@?=:+#%_-]+}$"#)
+
+/// Regular expression that matches semver convention
+const SEMVER_REGEX = Regex(#"(?<Major>0|(?:[1-9]\d*))(?:\.(?<Minor>0|(?:[1-9]\d*))(?:\.(?<Patch>0|(?:[1-9]\d*)))?(?:\-(?<PreRelease>[a-zA-Z0-9_]+))?(?:\.(?<Meta>[a-zA-Z0-9_\.]+))?)?"#)
+
+/// Regular expession for hostname
+const HOSTNAME_REGEX = Regex(#"^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$"#)

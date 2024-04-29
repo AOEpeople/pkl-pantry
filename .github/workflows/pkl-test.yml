@@ -1,0 +1,38 @@
+on:
+  workflow_call:
+  pull_request:
+    paths:
+      - packages/**
+
+jobs:
+  list-packages:
+    runs-on: ubuntu-latest
+    outputs:
+      dirs: ${{ steps.dirs.outputs.dirs }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: dirs
+        # language=shell script
+        run: |
+          echo "dirs=$(ls -d packages/*/ | sed 's:/*$::' | jq --raw-input --slurp --compact-output 'split("\n")[:-1]')" >> ${GITHUB_OUTPUT}
+          cat ${GITHUB_OUTPUT}
+
+  matrix:
+    runs-on: ubuntu-latest
+    needs: [list-packages]
+    defaults:
+      run:
+        working-directory: .
+    strategy:
+      matrix:
+        dir: ${{ fromJson(needs.list-packages.outputs.dirs) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Init Hermit
+        uses: cashapp/activate-hermit@v1
+        with:
+          cache: true
+      # language=shell script
+      - name: ${{ matrix.dir }}-test
+        run : |
+          pkl test -w ${{ matrix.dir }}

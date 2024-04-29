@@ -1,0 +1,54 @@
+###
+# Docker Build job
+###
+.docker-build-job:
+  image:
+    name: docker:cli
+  services:
+    ## Runs docker in docker to be able to build images
+    - name: docker:dind
+      alias: docker
+  variables:
+
+    ## Specifies the build context directory
+    BUILD_CONTEXT_PATH: .
+
+    ## Path to the docker file that should be built
+    DOCKERFILE_PATH: Dockerfile
+
+    ## List of OS/ARCH combinations to build
+    TARGET_PLATFORM: "linux/amd64,linux/arm64"
+
+    ## The image tag to create
+    IMAGE_TAG: ${CI_COMMIT_SHORT_SHA}
+
+    ## Tag to used for cache image
+    IMAGE_CACHE_TAG: ${CI_COMMIT_REF_SLUG}
+
+    ## Additional command args to `docker buildx build`
+    COMMAND_ARGS: >
+      --pull
+      --push
+
+  before_script:
+    - apk add curl git
+    - echo "${CI_JOB_TOKEN}" | docker login "${CI_REGISTRY}" --username "${CI_REGISTRY_USER}" --password-stdin
+    - docker context create tls-environment
+    - docker buildx create --name multiarch --driver docker-container --use tls-environment
+    - docker buildx inspect --bootstrap
+  script:
+    - >
+      docker buildx build ${BUILD_CONTEXT_PATH}
+        --progress="plain"
+        --file ${DOCKERFILE_PATH}
+        --platform=${TARGET_PLATFORM}
+        --cache-from type="registry,ref=${CI_REGISTRY_IMAGE}:${IMAGE_CACHE_TAG}" --cache-to=type=inline
+        --label "org.opencontainers.image.title=${CI_PROJECT_NAME}"
+        --label "org.opencontainers.image.description=${CI_PROJECT_TITLE}"
+        --label "org.opencontainers.image.created=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+        --label "org.opencontainers.image.source=${CI_PROJECT_URL}"
+        --label "org.opencontainers.image.revision=${CI_COMMIT_SHORT_SHA}"
+        --label "org.opencontainers.image.ref.name=${CI_COMMIT_REF_SLUG}"
+        --tag "${CI_REGISTRY_IMAGE}:${IMAGE_TAG}"
+        --tag "${CI_REGISTRY_IMAGE}:${IMAGE_CACHE_TAG}"
+        ${COMMAND_ARGS}

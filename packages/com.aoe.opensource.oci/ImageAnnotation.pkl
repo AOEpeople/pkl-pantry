@@ -1,0 +1,14 @@
+@ModuleInfo { minPklVersion = "0.25.3" }
+module com.aoe.opensource.oci.ImageAnnotation
+
+/// The annotation prefix for images
+const ANNOTATION_PREFIX = "org.opencontainers.image"
+
+/// The annotation name
+name: String
+
+/// The annotations value (must be convertible to string)
+value: Boolean|Number|String
+
+/// Returns the annotation string
+function toString(): String = "\(ANNOTATION_PREFIX).\(this.name)=\(this.value.toString())"

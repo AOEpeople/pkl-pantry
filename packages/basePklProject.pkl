@@ -1,0 +1,37 @@
+amends "pkl:Project"
+
+import "pkl:reflect"
+import "common.pkl"
+
+package {
+  name = common.findRootModule(reflect.Module(module))
+    .relativePathTo(module)
+    .last
+  description = reflect.Module(module).docComment
+  license = "Apache-2.0"
+  authors = common.authors
+  exclude {
+    "examples/**"
+    "tests/**"
+    "testdata/**"
+  }
+  apiTests = tests
+
+  baseUri = "\(common.packageBaseUri)/packages/\(name)"
+  packageZipUrl = common.getPackageZipURL(name, version)
+  issueTracker = common.getIssueTrackerURL()
+  sourceCode = common.getSourceCodeURL(name, version)
+  sourceCodeUrlScheme = common.getSourceCodeURLSchema(name, version)
+}
+
+tests {
+  for (test in import* ("**/tests/**.pkl").keys.filter((it) -> !it.contains("tests/fixtures/"))) {
+    when (test.split("/").first == package.name) {
+      test.replaceFirst(package.name, ".")
+    }
+  }
+}
+
+output {
+  renderer = new JsonRenderer {}
+}

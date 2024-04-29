@@ -1,0 +1,14 @@
+module com.gitlab.ci.golang.examples.generate
+
+amends "@gitlabci/pipeline.pkl"
+
+import ".../jobs/generate.pkl" as gogenerate
+import ".../golang.pkl"
+
+jobs {
+  ["basic"] = new gogenerate.Job{}
+
+  ["with-custom-args"] = new gogenerate.Job{
+    inputs = super.inputs |> golang.withClearDefaultArgs() |> golang.withArg("subfolder/tools.go")
+  }
+}

@@ -1,0 +1,71 @@
+/// Mixins for AbstractJob or every child implementation
+module com.gitlab.ci.schema.mixins.job
+
+import ".../AbstractJob.pkl"
+import ".../Image.pkl"
+import ".../gitlab.pkl"
+import "utils.pkl"
+
+/// Mixin that adds printenv command to before_script if enabled is true
+const function withPrintEnv(enabled: Boolean) = new Mixin<AbstractJob> {
+  before_script {
+    when (enabled) {
+      "printenv | sort"
+    }
+  }
+}
+
+/// Mixin to add gitlab registry login to before_script section
+const function withGitlabRegistryLogin() = new Mixin<AbstractJob> {
+  before_script {
+   gitlab.GITLAB_REGISTRY_LOGIN_CMD
+  }
+}
+
+/// Mixin to add gitlab registry login to before_script section
+const function withGitlabDependencyProxyRegistryLogin() = new Mixin<AbstractJob> {
+  before_script {
+    gitlab.GITLAB_DEPENDENCY_PROXY_LOGIN_CMD
+  }
+}
+
+/// Mixin to define if gitlab dependency proxy should be activated
+const function withDependencyProxy(enabled: Boolean) = new Mixin<AbstractJob> {
+  before_script {
+    gitlab.GITLAB_DEPENDENCY_PROXY_LOGIN_CMD
+  }
+
+  image =
+    if (super.image is String)
+      utils.adjustImagePrefixForDependencyProxy(super.image as String, enabled)
+    else if (super.image is Image)
+      super.image.setImageName(utils.adjustImagePrefixForDependencyProxy(super.image.name, enabled))
+    else
+      super.image
+
+  services = super.services.toList().map((it) ->
+    if (it is String)
+      utils.adjustImagePrefixForDependencyProxy(it, enabled)
+    else
+      it.setImageName(utils.adjustImagePrefixForDependencyProxy(it.name, enabled))
+  ).toListing()
+}
+
+/// Mixin that automatically enables the used of dependency proxy if environment variable
+/// `CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX` is not empty.
+const function withAutoDependencyProxy() = new Mixin<AbstractJob> {
+  image =
+    if (super.image is String)
+      utils.adjustImagePrefixForDependencyProxy(
+        super.image as String,
+        read?("env:CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX") != null
+      )
+    else if (super.image is Image)
+      super.image.setImageName(
+        utils.adjustImagePrefixForDependencyProxy(
+          super.image.name,
+          read?("env:CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX") != null
+        ))
+    else
+      super.image
+}

@@ -1,0 +1,32 @@
+/// Module that provides a configurable golang build job
+module com.gitlab.ci.golang.jobs.build
+
+import ".../golang.pkl"
+
+/// Input class for build jobs
+class JobInputs extends golang.JobInputs {
+
+  /// file path to main.go or file that should be built
+  mainFile: String = "main.go"
+
+  /// filepath to the output file of go build
+  outFile: String = "app"
+}
+
+/// Mixin to modify mainFile property of BuildJobInputs
+const function withMainFile(filepath: String) = new Mixin<JobInputs> {
+  mainFile = filepath
+}
+
+/// Mixin to modify outFile property of BuildJobInputs
+const function withOutFile(filepath: String) = new Mixin<JobInputs> {
+  outFile = filepath
+}
+
+/// Golang build job
+class Job extends golang.AbstractGolangJob {
+  inputs: JobInputs
+  script {
+    "go build -o \(inputs.outFile) \(inputs.mainFile)"
+  }
+}

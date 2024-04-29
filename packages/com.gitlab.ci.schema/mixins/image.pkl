@@ -1,0 +1,19 @@
+/// Mixins for AbstractJob or every child implementation
+module com.gitlab.ci.schema.mixins.job
+
+import ".../Image.pkl"
+import "utils.pkl"
+
+/// Mixin to define if gitlab dependency proxy should be activated
+function withDependencyProxy(enabled: Boolean) = new Mixin<Image> {
+  name = utils.adjustImagePrefixForDependencyProxy(super.name, enabled)
+}
+
+/// Mixin that automatically enables the used of dependency proxy if environment variable
+/// `CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX` is not empty.
+function withAutoDependencyProxy() = new Mixin<Image> {
+  name = utils.adjustImagePrefixForDependencyProxy(
+    super.name,
+    read?("env:CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX") != null
+  )
+}

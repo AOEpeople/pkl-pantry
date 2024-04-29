@@ -1,0 +1,19 @@
+module com.gitlab.ci.docker.examples.docker
+
+amends "@gitlabci/pipeline.pkl"
+
+import ".../docker.pkl"
+
+jobs {
+  ["basic"] = new docker.Job {
+    script {
+      "docker --version"
+    }
+  }
+
+  ["with-print-docker-info"] = new docker.Job {
+    script {
+      "docker --version"
+    }
+  } |> docker.withPrintDockerInfo(true)
+}

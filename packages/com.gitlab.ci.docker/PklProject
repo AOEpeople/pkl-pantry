@@ -1,0 +1,15 @@
+amends ".../basePklProject.pkl"
+
+package {
+  version = "0.1.0"
+  description = """
+    Package that provides Jobs for building docker images
+    """
+}
+
+
+dependencies {
+  ["gitlabci"] = import("../com.gitlab.ci.schema/PklProject")
+  ["aoestrings"] = import("../com.aoe.opensource.strings/PklProject")
+  ["oci"] = import("../com.aoe.opensource.oci/PklProject")
+}

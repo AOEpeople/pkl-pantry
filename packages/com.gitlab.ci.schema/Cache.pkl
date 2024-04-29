@@ -1,0 +1,35 @@
+/// Use `cache` to specify a list of files and directories to cache between jobs.
+/// You can only use paths that are in the local working copy.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#cache)",
+@ModuleInfo { minPklVersion = "0.25.1" }
+module com.gitlab.ci.schema.Cache
+
+import "gitlab.pkl"
+
+/// Use the `cache:key` keyword to give each cache a unique identifying key.
+/// All jobs that use the same cache key use the same cache, including in different pipelines.
+/// Must be used with `cache:path`, or nothing is cached.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#cachekey).
+key: String(matches(Regex(#"^(?!.*\/)^(.*[^.]+.*)$"#)))|gitlab.KeySpec
+
+/// Use the `cache:paths` keyword to choose which files or directories to cache.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#cachepaths)
+paths: Listing<String>?
+
+/// Determines the strategy for downloading and updating the cache.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#cachepolicy)
+policy: "pull-push"|"pull"|"push"|String(matches(Regex(#"\$\w{1,255}"#))) = "pull-push"
+
+/// Use `unprotect: true` to set a cache to be shared between protected and unprotected branches.
+unprotected: Boolean?
+
+/// Use `untracked: true` to cache all files that are untracked in your Git repository.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#cacheuntracked)
+untracked: Boolean?
+
+/// Defines when to save the cache, based on the status of the job.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#cachewhen).
+`when`: "on_success"|"on_failure"|"always" = "on_success"
+
+/// List of keys to download cache from if no cache hit occurred for key
+fallback_keys: Listing<String>(length <= 5)?

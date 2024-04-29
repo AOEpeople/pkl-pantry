@@ -1,0 +1,10 @@
+[versions]
+pkl = "0.+"
+kotlin = "1.+"
+
+[libraries]
+pklCore = { group = "org.pkl-lang", name = "pkl-core", version.ref = "pkl" }
+pklDoc = { group = "org.pkl-lang", name = "pkl-doc", version.ref = "pkl" }
+
+[plugins]
+pkl = { id = "org.pkl-lang", version.ref = "pkl" }

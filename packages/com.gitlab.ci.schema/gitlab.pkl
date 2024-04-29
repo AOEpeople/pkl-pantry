@@ -1,0 +1,483 @@
+/// Module that holds common classes and types
+module com.gitlab.ci.schema.types
+
+import "@aoestrings/convert.pkl"
+
+/// Alias for docker image
+typealias ContainerImageName = String(length >= 1)
+
+/// Alias for docker entrypoint
+typealias ContainerEntrypoint = Listing<String>(!isEmpty)
+
+/// Options class for docker property. Used in image specifications in services and jobs
+class ContainerDockerOptions {
+
+  /// Image architecture to pull.
+  platform: String(length >= 1)?
+
+  /// Username or UID to use for the container.
+  user: String(length >= 1 && length <= 255)?
+}
+
+/// Type that defines the possible values for a image pull policy
+typealias ContainerImagePullPolicyValue = "always"|"never"|"if-not-present"
+
+/// Type that defines the container pull policy spec used in different places
+typealias ContainerImagePullPolicy =
+  ContainerImagePullPolicyValue
+  |Listing<ContainerImagePullPolicyValue>(!isEmpty, isDistinct)
+
+/// Command or script that should be used as the container's command.
+/// It will be translated to arguments passed to Docker after the image's name.
+/// The syntax is similar to Dockerfile's CMD directive, where each shell token is a separate string in the array.
+/// [Learn More](https://docs.gitlab.com/ee/ci/services/index.html#available-settings-for-services)",
+typealias ContainerCommand = Listing<String>(!isEmpty)
+
+/// Defines default variables for all jobs. Job level property overrides global variables.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#variables).
+typealias GlobalVariables = Mapping<String, Boolean|Number|String|GlobalVariableSpec>
+
+/// Defines the specification of a global variable that uses object notation
+class GlobalVariableSpec {
+
+  /// Default value of the variable. If used with `options`, `value` must be included in the array.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#variablesvalue)
+  value: String
+
+  /// A list of predefined values that users can select from in the **Run pipeline**
+  /// page when running a pipeline manually.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#variablesoptions)"
+  options: Listing<String>(!isEmpty && isDistinct)?
+
+  /// Explains what the variable is used for, what the acceptable values are.
+  /// Variables with `description` are prefilled when running a pipeline manually.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#variablesdescription).
+  description: String?
+
+  /// Defines if the variable is expandable or not. [Learn More](https://docs.gitlab.com/ee/ci/yaml/#variablesexpand).
+  expand: Boolean?
+}
+
+/// Defines a script block that is used in jobs
+typealias Script = String(length >= 1)|Listing<String|Listing<String>(!isEmpty)(!isEmpty)>
+
+/// Filter job by different keywords that determine origin or state,
+/// or by supplying string/regex to check against branch/tag names.
+typealias FilterRef = // TODO: Check regular expresssion here
+  String(length >= 1) // String or regular expression to match against tag or branch names.
+  |"branches"     // When a branch is pushed.
+  |"tags"         // When a tag is pushed.
+  |"api"          // When a pipeline has been triggered by a second pipelines API (not triggers API).
+  |"external"     // When using CI services other than Gitlab
+  |"pipelines"    // For multi-project triggers, created using the API with 'CI_JOB_TOKEN'.
+  |"pushes"       // Pipeline is triggered by a `git push` by the user
+  |"schedules"    // For scheduled pipelines.
+  |"triggers"     // For pipelines created using a trigger token.
+  |"web"          // For pipelines created using *Run pipeline* button in Gitlab UI (under your project's *Pipelines*).
+
+/// Describes the conditions for when to run the job. Defaults to 'on_success'.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#when).
+typealias When = "on_success"|"on_failure"|"always"|"never"|"manual"|"delayed"
+
+/// Class that defines hooks, used in different places
+class Hooks {
+
+  /// Specifies a list of commands to execute on the runner before updating the Git repository and any submodules.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#hookspre_get_sources_script)."
+  pre_get_sources_script: Script?
+}
+
+class IDToken {
+
+  /// Audience
+  aud: String|Listing<String>(!isEmpty && isDistinct)
+}
+
+/// Map of IDToken objects
+typealias IDTokens = Mapping<String, IDToken>
+
+/// Sets a workload identity (experimental), allowing automatic authentication with the external system.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#identity).
+typealias Identity = "google_cloud"
+
+/// The number of times the job will be retried if it fails.
+/// Defaults to 0 and can max be retried 2 times (3 times total).
+typealias RetryMax = Int(this >= 0 && this <= 2)
+
+typealias RetryError =
+  "always"                        // Retry on any failure (default).
+  |"unknown_failure"              // Retry when the failure reason is unknown.
+  |"script_failure"               // Retry when the script failed.
+  |"api_failure"                  // Retry on API failure.
+  |"stuck_or_timeout_failure"     // Retry when the job got stuck or timed out.
+  |"runner_system_failure"        // Retry if there is a runner system failure (for example, job setup failed).
+  |"runner_unsupported"           // Retry if the runner is unsupported.
+  |"stale_schedule"               // Retry if a delayed job could not be executed.
+  |"job_execution_timeout"        // Retry if the script exceeded the maximum execution time set for the job.
+  |"archived_failure"             // Retry if the job is archived and can’t be run.
+  |"unmet_prerequisites"          // Retry if the job failed to complete prerequisite tasks.
+  |"scheduler_failure"            // Retry if the scheduler failed to assign the job to a runner.
+  |"data_integrity_failure"       // Retry if there is an unknown job problem.
+
+class RetrySpec {
+
+  /// The number of times the job will be retried if it fails.
+  /// Defaults to 0 and can max be retried 2 times (3 times total).
+  max: RetryMax = 0
+
+  /// Either a single or array of error types to trigger job retry.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#retrywhen).
+  `when`: RetryError|Listing<RetryError>?
+
+  /// Either a single or array of exit codes to trigger job retry on.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#retryexit_codes).
+  exit_codes: Int|Listing<Int>(!isEmpty && isDistinct)?
+}
+
+/// Retry a job if it fails. Can be a simple integer or object definition.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#retry).
+typealias Retry = RetryMax|RetrySpec
+
+/// Used to select runners from the list of available runners. A runner must have all tags listed here to run the job.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#tags).
+typealias Tags = Listing<String|Listing<String>(!isEmpty)>(!isEmpty)
+
+/// Job settings for parallel matrix
+class ParallelSpec {
+  matrix: Any?
+}
+
+/// Use the `cache:key` keyword to give each cache a unique identifying key.
+/// All jobs that use the same cache key use the same cache, including in different pipelines.
+/// Must be used with `cache:path`, or nothing is cached. [Learn More](https://docs.gitlab.com/ee/ci/yaml/#cachekey).
+class KeySpec {
+
+  /// Use the `cache:key:files` keyword to generate a new key when one or two specific files change.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#cachekeyfiles)
+  files: Listing<String>(!isEmpty && length <= 2)?
+
+  /// Use `cache:key:prefix` to combine a prefix with the SHA computed for `cache:key:files`.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#cachekeyprefix)
+  prefix: String?
+}
+
+
+class ChangesRuleSpec {
+
+  /// List of file paths.
+  paths: Listing<String>
+
+  /// Ref for comparing changes.
+  compare_to: String?
+}
+
+/// Alias for if rules
+typealias IfRule = String
+
+/// Alias for changes rules
+typealias ChangesRule = ChangesRuleSpec|Listing<String>
+
+/// Alias for exists rule
+typealias ExistsRule = Listing<String>
+
+open class RuleSpec {
+
+  /// Expression to evaluate whether additional attributes should be provided to the job.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#rulesif).
+  `if`: IfRule?
+
+  /// Additional attributes will be provided to job if any of the provided paths matches a modified file.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#ruleschanges).
+  changes: ChangesRule|Null = new ChangesRuleSpec {}
+
+  /// Additional attributes will be provided to job if any of the provided paths matches an existing
+  /// file in the repository.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#rulesexists).",
+  exists: ExistsRule?
+
+  /// Defines variables for a rule result.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/index.html#rulesvariables).
+  variables: Mapping<String, Boolean|Number|String>?
+}
+
+
+open class IncludeRule {
+
+  /// Expression to evaluate whether additional attributes should be provided to the job.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#rulesif).
+  `if`: IfRule?
+
+  /// Additional attributes will be provided to job if any of the provided paths matches a modified file.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#ruleschanges).
+  changes: ChangesRule?
+
+  /// Additional attributes will be provided to job if any of the provided paths matches
+  /// an existing file in the repository.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#rulesexists).
+  exists: ExistsRule?
+
+  /// Use `when: never` to exclude the configuration file if the condition matches.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/includes.html#include-with-rulesif).
+  `when`: "never"|"always"|Null?
+}
+
+abstract class AbstractIncludeItem {
+
+  /// You can use rules to conditionally include other configuration files.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/includes.html#use-rules-with-include).
+  rules: String(length >= 1)|Listing<String>(length >= 1)|Listing<IncludeRule>|Null = null
+
+  /// Used to pass input values to included templates or components.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/includes.html#set-input-parameter-values-with-includeinputs).
+  inputs: Any?
+}
+
+class IncludeItemLocal extends AbstractIncludeItem {
+
+  /// Relative path from local repository root (`/`) to the `yaml`/`yml` file template.
+  /// The file must be on the same branch, and does not work across git submodules.
+  `local`: String(matches(Regex(#"\S+\.ya?ml$"#)))
+}
+
+class IncludeItemProject extends AbstractIncludeItem {
+
+  /// Path to the project, e.g. `group/project`, or `group/sub-group/project`
+  /// [Learn more](https://docs.gitlab.com/ee/ci/yaml/index.html#includefile).
+  project: String(matches(Regex(#"(?:\S+/\S+|\$\S+)"#)))
+
+  /// Branch/Tag/Commit-hash for the target project.
+  ref: String?
+
+  /// Relative path from project root (`/`) to the `yaml`/`yml` file template
+  /// or List of files by relative path from project root (`/`) to the `yaml`/`yml` file template.
+  file: String(matches(Regex(#"\S+\.ya?ml$"#)))?|Listing<String(matches(Regex(#"\S+\.ya?ml$"#)))>?
+
+}
+
+class IncludeItemTemplate extends AbstractIncludeItem {
+
+  /// Use a `.gitlab-ci.yml` template as a base, e.g. `Nodejs.gitlab-ci.yml`.
+  template: String(matches(Regex(#"\S+\.ya?ml$"#)))
+}
+
+class IncludeItemComponent extends AbstractIncludeItem {
+
+  /// Local path to component directory or full path to external component directory.
+  component: String
+}
+
+class IncludeItemRemote extends AbstractIncludeItem {
+
+  /// URL to a `yaml`/`yml` template file using HTTP/HTTPS.
+  remote: String(matches(Regex(#"^https?://.+\S+\.ya?ml$"#)))
+}
+
+/// Type alias to combine all possible include item types
+typealias IncludeItem =
+  String(matches(Regex(#"^(https?://|/?.?-?(?!\w+://)\w).+\S+\.ya?ml$"#)))
+  |IncludeItemLocal
+  |IncludeItemProject
+  |IncludeItemTemplate
+  |IncludeItemComponent
+  |IncludeItemRemote
+
+typealias Includes = IncludeItem|Listing<IncludeItem>
+
+class WorkflowAutoCancel {
+
+  /// Define which jobs to stop after a job fails.
+  on_job_failure: "none"|"all" = "none"
+
+  /// Configure the behavior of the auto-cancel redundant pipelines feature.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#workflowauto_cancelon_new_commit)
+  on_new_commit: "conservative"|"interruptible"|"none"?
+}
+
+class WorkflowRuleSpec {
+
+  /// Expression to evaluate whether additional attributes should be provided to the job.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#rulesif).
+  `if`: IfRule?
+
+  /// Additional attributes will be provided to job if any of the provided paths matches a modified file.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#ruleschanges).
+  changes: ChangesRule|Null = null
+
+  /// Additional attributes will be provided to job if any of the provided paths matches an existing
+  /// file in the repository.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#rulesexists).",
+  exists: ExistsRule?
+
+  /// Defines variables for a rule result.
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/index.html#rulesvariables).
+  variables: Mapping<String, Boolean|Number|String>?
+
+  /// Workflow when
+  `when`: "always"|"never"?
+
+  /// Define the rules for when pipeline should be automatically cancelled.
+  auto_cancel: WorkflowAutoCancel?
+}
+
+class Workflow {
+
+  /// Defines the pipeline name. [Learn More](https://docs.gitlab.com/ee/ci/yaml/#workflowname).
+  name: String(length >= 1 && length <= 255)
+
+  /// Define the rules for when pipeline should be automatically cancelled.
+  auto_cancel: WorkflowAutoCancel?
+
+  /// Workflow rules
+  rules: Listing<Listing<String>(!isEmpty)|WorkflowRuleSpec>?
+}
+
+class CoverageReportSpec {
+
+  /// Code coverage format used by the test framework.
+  coverage_format: "cobertura"?
+
+  /// Path to the coverage report file that should be parsed.
+  path: String(length >= 1)?
+}
+
+typealias StringFileList = String|Listing<String>
+
+class Reports {
+
+  /// Path for file(s) that should be parsed as JUnit XML result
+  junit: String|Listing<String>(!isEmpty)?
+
+  /// Path to a single file with browser performance metric report(s).
+  browser_performance: String?
+
+  /// Used to collect coverage reports from the job.
+  coverage_report: CoverageReportSpec|Null = null
+
+  /// Path to file or list of files with code quality report(s) (such as Code Climate).
+  codequality: StringFileList?
+
+  /// Path to file or list of files containing runtime-created variables for this job.
+  dotenv: StringFileList?
+
+  /// Path to file or list of files containing code intelligence (Language Server Index Format).
+  lsif: StringFileList?
+
+  /// Path to file or list of files with SAST vulnerabilities report(s).
+  sast: StringFileList?
+
+  /// Path to file or list of files with Dependency scanning vulnerabilities report(s).
+  dependency_scanning: StringFileList?
+
+  /// Path to file or list of files with Container scanning vulnerabilities report(s).
+  container_scanning: StringFileList?
+
+  /// Path to file or list of files with DAST vulnerabilities report(s).
+  dast: StringFileList?
+  /// Deprecated in 12.8: Path to file or list of files with license report(s).
+  license_management: StringFileList?
+
+  /// Path to file or list of files with license report(s).
+  license_scanning: StringFileList?
+
+  /// Path to file or list of files with requirements report(s).
+  requirements: StringFileList?
+
+  /// Path to file or list of files with secret detection report(s).
+  secret_detection: StringFileList?
+
+  /// Path to file or list of files with custom metrics report(s).
+  metrics: StringFileList?
+
+  /// Path to file or list of files with terraform plan(s).
+  terraform: StringFileList?
+
+  /// Path to file or list of files with cyclonedx report(s).
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/artifacts_reports.html#artifactsreportscyclonedx).
+  cyclonedx: StringFileList?
+
+  /// Path to file or list of files with load performance testing report(s).
+  /// [Learn More](https://docs.gitlab.com/ee/ci/yaml/artifacts_reports.html#artifactsreportsload_performance).
+  load_performance: StringFileList?
+
+  /// Path to file or list of files with Repository X-Ray report(s).
+  repository_xray: StringFileList?
+}
+
+/// Indicates that the job creates a Release.
+class Release {
+  /// The tag_name must be specified. It can refer to an existing Git tag or can be specified by the
+  /// user.
+  tag_name: String(!isEmpty)
+
+  /// Message to use if creating a new annotated tag.
+  tag_message: String?
+
+  /// Specifies the longer description of the Release.
+  description: String(!isEmpty)
+
+  /// The Release name. If omitted, it is populated with the value of release: tag_name.
+  name: String?
+
+  /// If the release: tag_name doesn’t exist yet, the release is created from ref. ref can be a commit
+  /// SHA, another tag name, or a branch name.
+  ref: String?
+
+  /// The title of each milestone the release is associated with.
+  milestones: Listing<String>?
+
+  /// The date and time when the release is ready. Defaults to the current date and time if not defined.
+  /// Should be enclosed in quotes and expressed in ISO 8601 format.
+  released_at: String(matches(Regex(#"^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:Z|[+-][01]\d:[0-5]\d)$"#)))?
+
+  assets: Assets?
+}
+
+class Assets {
+  /// Include asset links in the release.
+  links: Listing<Link>(!isEmpty)
+}
+
+class Link {
+  /// The name of the link.
+  name: String(!isEmpty)
+
+  /// The URL to download a file.
+  url: String(!isEmpty)
+
+  /// The redirect link to the url.
+  filepath: String?
+
+  /// The content kind of what users can download via url.
+  link_type: ("runbook"|"package"|"image"|"other")?
+}
+
+/// Function to transform the given string to UPPER_SNAKE_CASE and wrap it into ${UPPER_SNAKE_CASE} format
+const function var(name: String): String = "${\(convert.toUpperSnakeCase(name))}"
+
+/// Same as var, but adds the prefix CI_ to the variable
+const function ciVar(name: String): String = "${CI_\(convert.toUpperSnakeCase(name))}"
+
+/// Command string for gitlab registry login
+const GITLAB_REGISTRY_LOGIN_CMD = "echo \(ciVar("JobToken")) | docker login --password-stdin \(ciVar("Registry")) --username \(ciVar("RegistryUser"))"
+
+/// Command string for gitlab dependency proxy login
+const GITLAB_DEPENDENCY_PROXY_LOGIN_CMD = "echo \(ciVar("DependencyProxyUser")) | docker login --password-stdin \(ciVar("DependencyProxyServer")) --username \(ciVar("DependencyProxyUser"))"
+
+/// Helper function to create container image strings with tag
+function containerImage(registry: String, repository: String, tagOrDigest: String|Null): ContainerImageName =
+  let (tagOrDigest = if (tagOrDigest != null) tagOrDigest else "latest")
+    if (tagOrDigest.contains(":")) // only digests can contain the colon here
+      "\(registry)/\(repository)@\(tagOrDigest)"
+    else
+      "\(registry)/\(repository):\(tagOrDigest)"
+
+local const dockerHubHost = "docker.io"
+local const dockerHubRepoPrefix = "library"
+
+/// Helper to create container image string from docker hub specifically
+function dockerHubImage(repository: String, tagOrDigest: String|Null): ContainerImageName =
+  let (tagOrDigest = if (tagOrDigest != null) tagOrDigest else "latest")
+    if (!repository.contains("/"))
+      containerImage(dockerHubHost, "\(dockerHubRepoPrefix)/\(repository)", tagOrDigest)
+    else
+      containerImage(dockerHubHost, repository, tagOrDigest)

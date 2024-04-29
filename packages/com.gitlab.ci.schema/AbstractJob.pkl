@@ -1,0 +1,83 @@
+@ModuleInfo { minPklVersion = "0.25.1" }
+abstract module com.gitlab.ci.schema.AbstractJob
+
+import "AbstractService.pkl"
+import "Cache.pkl"
+import "Image.pkl"
+import "Artifacts.pkl"
+import "gitlab.pkl"
+
+/// Defines variables for a job. [Learn More](https://docs.gitlab.com/ee/ci/yaml/#variables).
+typealias Variables = Mapping<String, Boolean|Number|String|VariableSpec>
+
+/// Defines the specification for a job variable value that uses expand.
+class VariableSpec {
+
+  /// The variables value
+  value: String
+
+  /// Defines if the variable is expandable or not. [Learn More](https://docs.gitlab.com/ee/ci/yaml/#variablesexpand).
+  expand: Boolean?
+}
+
+/// Job inputs as hidden field to allow configuration of jobs that extend from this abstract
+hidden inputs: Typed?
+
+/// Container image to use for this job
+image: gitlab.ContainerImageName|Image|Null = null
+
+/// Pipeline stage to use
+stage: String|Listing<String>? = null
+
+local class Service extends AbstractService
+
+/// Services to start with the job
+services: Listing<gitlab.ContainerImageName|AbstractService> = new Listing {
+  default = (_) -> new Service {}
+}
+
+/// Script block that runs before the main script block of this job
+before_script: gitlab.Script = new Listing {}
+
+/// Script block that runs after the main script block of this job
+after_script: gitlab.Script = new Listing {}
+
+/// Job variables
+variables: Variables?
+
+/// Shell scripts executed by the Runner. The only required property of jobs.
+/// Be careful with special characters (e.g. `:`, `{`, `}`, `&`) and use single or double quotes to avoid issues.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#script)
+script: gitlab.Script = new Listing {}
+
+/// Job cache settings
+cache: Cache?
+
+/// Specifies lists of commands to execute on the runner at certain stages of job execution.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#hooks).
+hooks: gitlab.Hooks?
+
+/// Parallel job spec
+parallel: Number(this >= 2 && this <= 200)|gitlab.ParallelSpec? = null
+
+/// Job artifacts
+artifacts: Artifacts?
+
+/// Needs config
+needs: Listing<String|Dynamic>?
+
+/// Rules allows for an array of individual rule objects to be evaluated in order,
+/// until one matches and dynamically provides attributes to the job.
+/// [Learn More](https://docs.gitlab.com/ee/ci/yaml/#rules).",
+rules: Listing<String|Listing<String>|gitlab.RuleSpec>|Null = new Listing<gitlab.RuleSpec> {
+  default = (_) -> new gitlab.RuleSpec {}
+}
+
+/// Function to set name of the image
+function setImageName(_image: String) =
+  if (this.image is String)
+    this.toMap().put("image", _image).toTyped(module.getClass())
+  else if (this.image is Image)
+    this.image.setImageName(_image)
+  else
+    null

@@ -1,0 +1,27 @@
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  docs:
+    name: Genrate PKL Docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Init Hermit
+        uses: cashapp/activate-hermit@v1
+        with:
+          cache: true
+      - name: Generate Docs
+        run: |
+          java --version
+          find ./docs -maxdepth 1 ! -name packages -not -path './docs' -exec rm -rf {} +
+          ./gradlew pkldoc --stacktrace
+      - uses: EndBug/add-and-commit@v9
+        if: success()
+        with:
+          add: docs/*
+          message: 'chore(generate): update package docs'
+          push: true
