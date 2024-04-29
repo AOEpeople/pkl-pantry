@@ -1,0 +1,25 @@
+{
+  "name": "com.gitlab.ci.schema",
+  "packageUri": "package://opensource.aoe.com/pkl-pantry/packages/com.gitlab.ci.schema@0.1.0",
+  "version": "0.1.0",
+  "packageZipUrl": "https://github.com/AOEPeople/pkl-pantry/releases/download/com.gitlab.ci.schema@0.1.0/com.gitlab.ci.schema@0.1.0.zip",
+  "packageZipChecksums": {
+    "sha256": "71b0fa18baefefce861dd3c2252dad9286ac4554dceee168897b12b8ca376412"
+  },
+  "dependencies": {
+    "aoestrings": {
+      "uri": "package://opensource.aoe.com/pkl-pantry/packages/com.aoe.opensource.strings@0.1.0",
+      "checksums": {
+        "sha256": "aa052341d25b3692ad98fbccdd15ada2ee4d703b47d3899bb9b96799bb5d41e5"
+      }
+    }
+  },
+  "sourceCodeUrlScheme": "https://github.com/AOEPeople/pkl-pantry/blob/com.gitlab.ci.schema@0.1.0/packages/com.gitlab.ci.schema%{path}#L%{line}-%{endLine}",
+  "sourceCode": "https://github.com/AOEPeople/pkl-pantry/tree/com.gitlab.ci.schema@0.1.0/packages/com.gitlab.ci.schema",
+  "license": "Apache-2.0",
+  "authors": [
+    "Dominik Tomasi <dominik.tomasi@gmail.com>"
+  ],
+  "issueTracker": "https://github.com/AOEPeople/pkl-pantry/issues",
+  "description": "Package that provides the schema for GitlabCI"
+}

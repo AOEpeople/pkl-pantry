@@ -1,0 +1,37 @@
+{
+  "name": "com.gitlab.ci.docker",
+  "packageUri": "package://opensource.aoe.com/pkl-pantry/packages/com.gitlab.ci.docker@0.1.0",
+  "version": "0.1.0",
+  "packageZipUrl": "https://github.com/AOEPeople/pkl-pantry/releases/download/com.gitlab.ci.docker@0.1.0/com.gitlab.ci.docker@0.1.0.zip",
+  "packageZipChecksums": {
+    "sha256": "f261f88e195753c64f262fd7ed773287003bc76593cfa7b9ff334d50bbb5b889"
+  },
+  "dependencies": {
+    "oci": {
+      "uri": "package://opensource.aoe.com/pkl-pantry/packages/com.aoe.opensource.oci@0.1.0",
+      "checksums": {
+        "sha256": "0a15ed43541bdb015683b5af46cf366b3948c894a67867af92be9249bc8de632"
+      }
+    },
+    "gitlabci": {
+      "uri": "package://opensource.aoe.com/pkl-pantry/packages/com.gitlab.ci.schema@0.1.0",
+      "checksums": {
+        "sha256": "7d76a24562acb540b69fd6cdf6c4544fb776b4cbad29f67c492447d8e8d93a90"
+      }
+    },
+    "aoestrings": {
+      "uri": "package://opensource.aoe.com/pkl-pantry/packages/com.aoe.opensource.strings@0.1.0",
+      "checksums": {
+        "sha256": "aa052341d25b3692ad98fbccdd15ada2ee4d703b47d3899bb9b96799bb5d41e5"
+      }
+    }
+  },
+  "sourceCodeUrlScheme": "https://github.com/AOEPeople/pkl-pantry/blob/com.gitlab.ci.docker@0.1.0/packages/com.gitlab.ci.docker%{path}#L%{line}-%{endLine}",
+  "sourceCode": "https://github.com/AOEPeople/pkl-pantry/tree/com.gitlab.ci.docker@0.1.0/packages/com.gitlab.ci.docker",
+  "license": "Apache-2.0",
+  "authors": [
+    "Dominik Tomasi <dominik.tomasi@gmail.com>"
+  ],
+  "issueTracker": "https://github.com/AOEPeople/pkl-pantry/issues",
+  "description": "Package that provides Jobs for building docker images"
+}

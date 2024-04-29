@@ -1,0 +1,18 @@
+{
+  "name": "com.aoe.opensource.oci",
+  "packageUri": "package://opensource.aoe.com/pkl-pantry/packages/com.aoe.opensource.oci@0.1.0",
+  "version": "0.1.0",
+  "packageZipUrl": "https://github.com/AOEPeople/pkl-pantry/releases/download/com.aoe.opensource.oci@0.1.0/com.aoe.opensource.oci@0.1.0.zip",
+  "packageZipChecksums": {
+    "sha256": "f5396ab8f102a9f1b74475e4a72e2e1cddb66750a1b62b6da0170c95e17a1781"
+  },
+  "dependencies": {},
+  "sourceCodeUrlScheme": "https://github.com/AOEPeople/pkl-pantry/blob/com.aoe.opensource.oci@0.1.0/packages/com.aoe.opensource.oci%{path}#L%{line}-%{endLine}",
+  "sourceCode": "https://github.com/AOEPeople/pkl-pantry/tree/com.aoe.opensource.oci@0.1.0/packages/com.aoe.opensource.oci",
+  "license": "Apache-2.0",
+  "authors": [
+    "Dominik Tomasi <dominik.tomasi@gmail.com>"
+  ],
+  "issueTracker": "https://github.com/AOEPeople/pkl-pantry/issues",
+  "description": "Package that provides functions and helpers for testing"
+}
