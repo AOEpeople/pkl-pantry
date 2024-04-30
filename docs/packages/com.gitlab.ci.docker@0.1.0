@@ -14,9 +14,9 @@
       }
     },
     "gitlabci": {
-      "uri": "package://opensource.aoe.com/pkl-pantry/packages/com.gitlab.ci.schema@0.1.0",
+      "uri": "package://opensource.aoe.com/pkl-pantry/packages/com.gitlab.ci.schema@0.1.1",
       "checksums": {
-        "sha256": "7d76a24562acb540b69fd6cdf6c4544fb776b4cbad29f67c492447d8e8d93a90"
+        "sha256": "e865cec4fd442c02b26ebeda07c9cbd4118b5c334a980ecb8d261162833787a1"
       }
     },
     "aoestrings": {
