@@ -3,7 +3,7 @@
   "resolvedDependencies": {
     "package://opensource.aoe.com/pkl-pantry/packages/com.aoe.opensource.strings@0": {
       "type": "local",
-      "uri": "projectpackage://opensource.aoe.com/pkl-pantry/packages/com.aoe.opensource.strings@0.1.1",
+      "uri": "projectpackage://opensource.aoe.com/pkl-pantry/packages/com.aoe.opensource.strings@0.1.0",
       "path": "../com.aoe.opensource.strings"
     }
   }
