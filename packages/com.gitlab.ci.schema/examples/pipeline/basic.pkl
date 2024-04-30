@@ -28,6 +28,15 @@ local class GolangJob extends AbstractJob {
   image = gitlab.dockerHubImage("golang", "1.12")
 }
 
+cache {
+  key = "gradle-build"
+  policy = "pull-push"
+  paths {
+    "build"
+  }
+}
+
+
 /// Jobs
 jobs {
 
