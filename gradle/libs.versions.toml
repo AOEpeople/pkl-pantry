@@ -1,6 +1,6 @@
 [versions]
 pkl = "0.+"
-kotlin = "1.+"
+kotlin = "2.+"
 
 [libraries]
 pklCore = { group = "org.pkl-lang", name = "pkl-core", version.ref = "pkl" }
